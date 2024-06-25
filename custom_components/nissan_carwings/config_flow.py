@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import voluptuous as vol
 from homeassistant import config_entries, data_entry_flow
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -36,6 +36,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 await self._test_credentials(
                     username=user_input[CONF_USERNAME],
                     password=user_input[CONF_PASSWORD],
+                    region=user_input[CONF_REGION],
                 )
             except NissanCarwingsApiClientAuthenticationError as exception:
                 LOGGER.warning(exception)
@@ -69,19 +70,35 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             type=selector.TextSelectorType.PASSWORD,
                         ),
                     ),
+                    vol.Required(
+                        CONF_REGION, description="Region"
+                    ): selector.SelectSelector(
+                        {
+                            "options": [
+                                {"value": "NE", "label": "NE (Europe)"},
+                                {"value": "NNA", "label": "NNA (USA)"},
+                                {"value": "NCI", "label": "NCI (Canada)"},
+                                {"value": "NMA", "label": "NMA (Australia)"},
+                                {"value": "NML", "label": "NML (Japan)"},
+                            ]
+                        }
+                    ),
                 },
             ),
             errors=_errors,
         )
 
-    async def _test_credentials(self, username: str, password: str) -> None:
+    async def _test_credentials(
+        self, username: str, password: str, region: str
+    ) -> None:
         """Validate credentials."""
         client = NissanCarwingsApiClient(
             username=username,
             password=password,
+            region=region,
             session=async_create_clientsession(self.hass),
         )
-        await client.async_get_data()
+        await client.async_test_credentials()
 
     @staticmethod
     @callback

@@ -7,6 +7,12 @@ from typing import Any
 
 import aiohttp
 import async_timeout
+import pycarwings3
+
+from custom_components.nissan_carwings.const import LOGGER
+
+# TODO: make this configurable for development
+BASE_URL = "https://carwings-simulator.herokuapp.com/api/"
 
 
 class NissanCarwingsApiClientError(Exception):
@@ -42,12 +48,33 @@ class NissanCarwingsApiClient:
         self,
         username: str,
         password: str,
+        region: str,
         session: aiohttp.ClientSession,
     ) -> None:
         """Sample API Client."""
         self._username = username
         self._password = password
+        self._region = region
         self._session = session
+        self._carwings3 = pycarwings3.Session(
+            username, password, region, session=session, base_url=BASE_URL
+        )
+
+    async def async_test_credentials(self) -> None:
+        """Test the credentials."""
+        try:
+            response = await self._carwings3.connect()
+            LOGGER.debug(
+                "Connected to Carwings, nickname=%s",
+                response.nickname,
+                extra={"response": response},
+            )
+
+        except pycarwings3.CarwingsError as exception:
+            msg = f"Error fetching information - {exception}"
+            raise NissanCarwingsApiClientError(
+                msg,
+            ) from exception
 
     async def async_get_data(self) -> Any:
         """Get data from the API."""
