@@ -7,14 +7,11 @@ from typing import Any
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION
 from .coordinator import CarwingsDataUpdateCoordinator
 
 
 class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
     """CarwingsEntity class."""
-
-    _attr_attribution = ATTRIBUTION
 
     # a prefix to be prepended to the unique_id of each entity
     unique_id_prefix: str
