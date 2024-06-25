@@ -24,8 +24,5 @@ class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
                     coordinator.config_entry.domain,
                     coordinator.config_entry.entry_id,
                 ),
-            },
-            name=coordinator.config_entry.runtime_data.integration.name,
-            model=coordinator.config_entry.runtime_data.integration.version,
-            manufacturer=coordinator.config_entry.runtime_data.integration.name,
+            }
         )
