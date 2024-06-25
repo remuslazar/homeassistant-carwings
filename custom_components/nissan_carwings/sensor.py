@@ -63,6 +63,11 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
         charging = self.coordinator.data["battery_status"].is_charging
         return icon_for_battery_level(battery_level=self.state, charging=charging)
 
+    @property
+    def available(self) -> bool:
+        """Sensor availability."""
+        return self.coordinator.data["battery_status"].battery_percent is not None
+
 
 class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
     """Remaining Range Sensor."""

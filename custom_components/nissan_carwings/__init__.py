@@ -37,6 +37,7 @@ async def async_setup_entry(
     """Set up this integration using UI."""
     coordinator = CarwingsDataUpdateCoordinator(
         hass=hass,
+        config_entry=entry,
     )
     entry.runtime_data = NissanCarwingsData(
         client=NissanCarwingsApiClient(

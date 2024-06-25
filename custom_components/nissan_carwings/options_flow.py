@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.helpers import config_validation as cv
+
+from custom_components.nissan_carwings.const import OPTIONS_UPDATE_INTERVAL
 
 if TYPE_CHECKING:
     from homeassistant.data_entry_flow import FlowResult
@@ -30,9 +33,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Required(
-                        "option1",
-                        default=self.config_entry.options.get("option1"),  # type: ignore  # noqa: PGH003
-                    ): bool
+                        OPTIONS_UPDATE_INTERVAL,
+                        default=self.config_entry.options.get(
+                            OPTIONS_UPDATE_INTERVAL, 3600
+                        ),
+                    ): cv.positive_int,
                 }
             ),
         )

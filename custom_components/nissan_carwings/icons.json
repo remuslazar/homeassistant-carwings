@@ -1,0 +1,9 @@
+{
+    "services": {
+        "start_charge": "mdi:flash",
+        "update": "mdi:update"
+    },
+    "brand_icons": {
+        "nissan_carwings": "mdi:car"
+    }
+}

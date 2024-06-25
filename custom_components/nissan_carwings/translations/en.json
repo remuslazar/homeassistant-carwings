@@ -21,7 +21,7 @@
             "init": {
                 "description": "Carwings Integration Settings",
                 "data": {
-                    "option1": "Option 1"
+                    "update_interval": "Update Interval (in seconds)"
                 }
             }
         }
