@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.components.sensor.const import SensorDeviceClass
-from homeassistant.const import PERCENTAGE, UnitOfLength
+from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfLength
 from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util.unit_conversion import DistanceConverter
 from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
@@ -33,6 +33,7 @@ async def async_setup_entry(
             BatterySensor(coordinator=coordinator),
             RemainingRangeSensor(coordinator=coordinator, is_ac_on=True),
             RemainingRangeSensor(coordinator=coordinator, is_ac_on=False),
+            BatteryCapacitySensor(coordinator=coordinator),
         ]
     )
 
@@ -106,3 +107,33 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
         if self.hass.config.units is US_CUSTOMARY_SYSTEM:
             return UnitOfLength.MILES
         return UnitOfLength.KILOMETERS
+
+
+class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
+    """Current Battery Capacity Sensor."""
+
+    def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
+        """Initialize the sensor class."""
+        super().__init__(coordinator)
+        self.entity_description = SensorEntityDescription(
+            key="battery_capacity",
+            name="Battery Capacity",
+            device_class=SensorDeviceClass.ENERGY_STORAGE,
+            native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+        )
+        self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
+
+    @property
+    def available(self) -> bool:
+        """Sensor availability."""
+        return (
+            self.coordinator.data["battery_status"].battery_remaining_amount_wh
+            is not None
+        )
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the native value of the sensor."""
+        return float(
+            self.coordinator.data["battery_status"].battery_remaining_amount_wh
+        )
