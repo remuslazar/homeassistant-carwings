@@ -1,4 +1,4 @@
-# Nissan Carwings
+# Nissan Carwings Integration for Home Assistant
 
 [![GitHub Release][releases-shield]][releases]
 [![GitHub Activity][commits-shield]][commits]
@@ -10,7 +10,7 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
-_Integration to integrate with [nissan_carwings][nissan_carwings]._
+An unofficial integration for interacting with Nissan Connect vehicles using the legacy Nissan Connect EV (Carwings) API.
 
 **This integration will set up the following platforms.**
 
