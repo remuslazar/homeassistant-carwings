@@ -5,6 +5,7 @@
     "@remuslazar"
   ],
   "config_flow": true,
+  "single_config_entry": true,
   "documentation": "https://github.com/remuslazar/homeassistant-carwings",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/remuslazar/homeassistant-carwings/issues",
