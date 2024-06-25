@@ -10,3 +10,6 @@ logger:
   default: info
   logs:
     custom_components.nissan_carwings: debug
+
+ffmpeg:
+  ffmpeg_bin: /usr/bin/true
