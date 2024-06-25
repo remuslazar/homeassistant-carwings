@@ -14,5 +14,15 @@
             "connection": "Unable to connect to the server.",
             "unknown": "Unknown error occurred."
         }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Carwings Integration Settings",
+                "data": {
+                    "option1": "Option 1"
+                }
+            }
+        }
     }
 }
