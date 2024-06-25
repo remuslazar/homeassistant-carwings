@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.components.sensor.const import SensorDeviceClass
-from homeassistant.const import PERCENTAGE
+from homeassistant.const import PERCENTAGE, UnitOfLength
 from homeassistant.helpers.icon import icon_for_battery_level
+from homeassistant.util.unit_conversion import DistanceConverter
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from .entity import NissanCarwingsEntity
 
@@ -25,9 +27,12 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
+    coordinator = entry.runtime_data.coordinator
     async_add_entities(
         [
-            BatterySensor(coordinator=entry.runtime_data.coordinator),
+            BatterySensor(coordinator=coordinator),
+            RemainingRangeSensor(coordinator=coordinator, is_ac_on=True),
+            RemainingRangeSensor(coordinator=coordinator, is_ac_on=False),
         ]
     )
 
@@ -39,11 +44,12 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
         self.entity_description = SensorEntityDescription(
-            key="nissan_carwings_sensor",
-            name="Integration Sensor",
+            key="battery_soc",
+            name="Battery SOC",
             device_class=SensorDeviceClass.BATTERY,
             native_unit_of_measurement=PERCENTAGE,
         )
+        self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
     @property
     def native_value(self) -> str | None:
@@ -53,5 +59,50 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def icon(self) -> str:
         """Battery state icon handling."""
-        charging = self.coordinator.data["battery_status"].charging_status
+        charging = self.coordinator.data["battery_status"].is_charging
         return icon_for_battery_level(battery_level=self.state, charging=charging)
+
+
+class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
+    """Remaining Range Sensor."""
+
+    def __init__(
+        self, coordinator: CarwingsDataUpdateCoordinator, *, is_ac_on: bool
+    ) -> None:
+        """Initialize the sensor class."""
+        super().__init__(coordinator)
+        self._ac_on = is_ac_on
+        self.entity_description = SensorEntityDescription(
+            key="range_ac_on" if is_ac_on else "range_ac_off",
+            name="Remaining Range (AC)" if is_ac_on else "Remaining Range",
+            device_class=SensorDeviceClass.DISTANCE,
+            native_unit_of_measurement=PERCENTAGE,
+        )
+        self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
+        self._attr_icon = "mdi:speedometer"
+
+    @property
+    def native_value(self) -> float | None:
+        """Battery range in miles or kms."""
+        ret: float | None
+        if self._ac_on:
+            ret = self.coordinator.data["battery_status"].cruising_range_ac_on_km
+        else:
+            ret = self.coordinator.data["battery_status"].cruising_range_ac_off_km
+
+        if ret is None:
+            return None
+
+        if self.hass.config.units is US_CUSTOMARY_SYSTEM:
+            ret = DistanceConverter.convert(
+                ret, UnitOfLength.KILOMETERS, UnitOfLength.MILES
+            )
+
+        return round(ret)
+
+    @property
+    def native_unit_of_measurement(self) -> str:
+        """Battery range unit."""
+        if self.hass.config.units is US_CUSTOMARY_SYSTEM:
+            return UnitOfLength.MILES
+        return UnitOfLength.KILOMETERS
