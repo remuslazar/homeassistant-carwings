@@ -16,6 +16,7 @@ from .api import (
     NissanCarwingsApiClientAuthenticationError,
     NissanCarwingsApiClientCommunicationError,
     NissanCarwingsApiClientError,
+    TestCredentialsResponse,
 )
 from .const import DOMAIN, LOGGER
 
@@ -33,7 +34,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         _errors = {}
         if user_input is not None:
             try:
-                await self._test_credentials(
+                res = await self._test_credentials(
                     username=user_input[CONF_USERNAME],
                     password=user_input[CONF_PASSWORD],
                     region=user_input[CONF_REGION],
@@ -49,7 +50,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 _errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=user_input[CONF_USERNAME],
+                    title=f"{res.nickname}(VIN={res.vin})",
                     data=user_input,
                 )
 
@@ -90,7 +91,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _test_credentials(
         self, username: str, password: str, region: str
-    ) -> None:
+    ) -> TestCredentialsResponse:
         """Validate credentials."""
         client = NissanCarwingsApiClient(
             username=username,
@@ -98,7 +99,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             region=region,
             session=async_create_clientsession(self.hass),
         )
-        await client.async_test_credentials()
+        return await client.async_test_credentials()
 
     @staticmethod
     @callback

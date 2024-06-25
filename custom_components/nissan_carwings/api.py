@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import socket
+from dataclasses import dataclass
 from typing import Any
 
 import aiohttp
@@ -41,8 +42,16 @@ def _verify_response_or_raise(response: aiohttp.ClientResponse) -> None:
     response.raise_for_status()
 
 
+@dataclass
+class TestCredentialsResponse:
+    """Response from the test_credentials method."""
+
+    vin: str
+    nickname: str
+
+
 class NissanCarwingsApiClient:
-    """Sample API Client."""
+    """Nissan Carwings API Client."""
 
     def __init__(
         self,
@@ -60,15 +69,21 @@ class NissanCarwingsApiClient:
             username, password, region, session=session, base_url=BASE_URL
         )
 
-    async def async_test_credentials(self) -> None:
-        """Test the credentials."""
+    async def async_test_credentials(self) -> TestCredentialsResponse:
+        """
+        Test the credentials.
+
+        This method tests the credentials by attempting to connect and login
+        If there is an error, it raises a NissanCarwingsApiClientError
+        """
         try:
             response = await self._carwings3.connect()
-            LOGGER.debug(
-                "Connected to Carwings, nickname=%s",
+            LOGGER.info(
+                "Connect/Login successful: nickname=%s, VIN=%s",
                 response.nickname,
-                extra={"response": response},
+                response.vin,
             )
+            return TestCredentialsResponse(vin=response.vin, nickname=response.nickname)
 
         except pycarwings3.CarwingsError as exception:
             msg = f"Error fetching information - {exception}"
