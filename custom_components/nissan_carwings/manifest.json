@@ -1,8 +1,8 @@
 {
   "domain": "nissan_carwings",
-  "name": "Integration blueprint",
+  "name": "Nissan Connect (Carwings)",
   "codeowners": [
-    "@ludeeus"
+    "@remuslazar"
   ],
   "config_flow": true,
   "documentation": "https://github.com/remuslazar/homeassistant-carwings",
