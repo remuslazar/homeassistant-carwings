@@ -17,12 +17,18 @@ class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
     def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
         """Initialize."""
         super().__init__(coordinator)
+        # see https://developers.home-assistant.io/blog/2022/07/10/entity_naming/
+        self.has_entity_name = True
         self._attr_unique_id = coordinator.config_entry.entry_id
+        vin = coordinator.config_entry.data["vin"]
+        nickname = coordinator.config_entry.data["nickname"]
         self._attr_device_info = DeviceInfo(
             identifiers={
                 (
                     coordinator.config_entry.domain,
                     coordinator.config_entry.entry_id,
                 ),
-            }
+            },
+            serial_number=vin,
+            name=nickname,
         )

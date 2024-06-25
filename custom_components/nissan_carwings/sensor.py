@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor.const import SensorDeviceClass
+from homeassistant.const import PERCENTAGE
+from homeassistant.helpers.icon import icon_for_battery_level
 
 from .entity import NissanCarwingsEntity
 
@@ -15,14 +18,6 @@ if TYPE_CHECKING:
     from .coordinator import CarwingsDataUpdateCoordinator
     from .data import NissanCarwingsConfigEntry
 
-ENTITY_DESCRIPTIONS = (
-    SensorEntityDescription(
-        key="nissan_carwings",
-        name="Integration Sensor",
-        icon="mdi:format-quote-close",
-    ),
-)
-
 
 async def async_setup_entry(
     hass: HomeAssistant,  # noqa: ARG001 Unused function argument: `hass`
@@ -31,27 +26,32 @@ async def async_setup_entry(
 ) -> None:
     """Set up the sensor platform."""
     async_add_entities(
-        NissanCarwingsSensor(
-            coordinator=entry.runtime_data.coordinator,
-            entity_description=entity_description,
-        )
-        for entity_description in ENTITY_DESCRIPTIONS
+        [
+            BatterySensor(coordinator=entry.runtime_data.coordinator),
+        ]
     )
 
 
-class NissanCarwingsSensor(NissanCarwingsEntity, SensorEntity):
-    """nissan_carwings Sensor class."""
+class BatterySensor(NissanCarwingsEntity, SensorEntity):
+    """Battery Sensor."""
 
-    def __init__(
-        self,
-        coordinator: CarwingsDataUpdateCoordinator,
-        entity_description: SensorEntityDescription,
-    ) -> None:
+    def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
-        self.entity_description = entity_description
+        self.entity_description = SensorEntityDescription(
+            key="nissan_carwings_sensor",
+            name="Integration Sensor",
+            device_class=SensorDeviceClass.BATTERY,
+            native_unit_of_measurement=PERCENTAGE,
+        )
 
     @property
     def native_value(self) -> str | None:
         """Return the native value of the sensor."""
-        return self.coordinator.data.get("body")
+        return round(self.coordinator.data["battery_status"].battery_percent)
+
+    @property
+    def icon(self) -> str:
+        """Battery state icon handling."""
+        charging = self.coordinator.data["battery_status"].charging_status
+        return icon_for_battery_level(battery_level=self.state, charging=charging)

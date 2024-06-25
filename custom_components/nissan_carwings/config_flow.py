@@ -16,7 +16,6 @@ from .api import (
     NissanCarwingsApiClientAuthenticationError,
     NissanCarwingsApiClientCommunicationError,
     NissanCarwingsApiClientError,
-    TestCredentialsResponse,
 )
 from .const import DOMAIN, LOGGER
 
@@ -50,8 +49,9 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 _errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
-                    title=f"{res.nickname}(VIN={res.vin})",
-                    data=user_input,
+                    description=f"{res['nickname']}(VIN={res['vin']})",
+                    title=res["nickname"],
+                    data={**user_input, **res},
                 )
 
         return self.async_show_form(
@@ -91,7 +91,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _test_credentials(
         self, username: str, password: str, region: str
-    ) -> TestCredentialsResponse:
+    ) -> dict[str, str]:
         """Validate credentials."""
         client = NissanCarwingsApiClient(
             username=username,

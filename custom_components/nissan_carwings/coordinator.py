@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .api import (
     NissanCarwingsApiClientAuthenticationError,
     NissanCarwingsApiClientError,
+    NissanCarwingsApiUpdateTimeoutError,
 )
 from .const import DOMAIN, LOGGER
 
@@ -25,6 +26,7 @@ class CarwingsDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     config_entry: NissanCarwingsConfigEntry
+    is_first_update = True
 
     def __init__(
         self,
@@ -35,13 +37,19 @@ class CarwingsDataUpdateCoordinator(DataUpdateCoordinator):
             hass=hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(hours=1),
+            update_interval=timedelta(minutes=3),  # todo: make this configurable
         )
 
     async def _async_update_data(self) -> Any:
         """Update data via library."""
         try:
+            if self.is_first_update:
+                self.is_first_update = False
+            else:
+                await self.config_entry.runtime_data.client.async_update_data()
             return await self.config_entry.runtime_data.client.async_get_data()
+        except NissanCarwingsApiUpdateTimeoutError as exception:
+            raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
         except NissanCarwingsApiClientError as exception:
