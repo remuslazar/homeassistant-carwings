@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+import pycarwings3
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-import pycarwings3
-import pycarwings3.responses
 
 from custom_components.nissan_carwings.const import DATA_BATTERY_STATUS_KEY
 
 from .coordinator import CarwingsDataUpdateCoordinator
+
+if TYPE_CHECKING:
+    import pycarwings3.responses
 
 
 class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
