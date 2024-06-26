@@ -4,14 +4,16 @@ from __future__ import annotations
 
 import asyncio
 import socket
-from dataclasses import dataclass
 from typing import Any
 
 import aiohttp
 import async_timeout
 import pycarwings3
+import pycarwings3.responses
 
 from custom_components.nissan_carwings.const import (
+    DATA_BATTERY_STATUS_KEY,
+    DATA_CLIMATE_STATUS_KEY,
     LOGGER,
     PYCARWINGS_MAX_RESPONSE_ATTEMPTS,
     PYCARWINGS_SLEEP,
@@ -127,10 +129,20 @@ class NissanCarwingsApiClient:
         try:
             response = await self._carwings3.get_leaf()
             LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
-            battery_status = await response.get_latest_battery_status()
-            LOGGER.debug(
-                f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%",  # noqa: E501 , PGH003# type: ignore
-            )
+            battery_status: (
+                pycarwings3.responses.CarwingsLatestBatteryStatusResponse | None
+            ) = await response.get_latest_battery_status()
+            if battery_status:
+                LOGGER.debug(
+                    f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%",  # noqa: E501
+                )
+            climate_status: (
+                pycarwings3.responses.CarwingsLatestClimateControlStatusResponse | None
+            ) = await response.get_latest_hvac_status()
+            if climate_status:
+                LOGGER.debug(
+                    f"carwings3.get_latest_hvac_status() OK: running={climate_status.is_hvac_running}"  # noqa: E501
+                )
 
         except pycarwings3.CarwingsError as exception:
             msg = f"Error fetching data - {exception}"
@@ -138,7 +150,10 @@ class NissanCarwingsApiClient:
                 msg,
             ) from exception
         else:
-            return {"battery_status": battery_status}
+            return {
+                DATA_BATTERY_STATUS_KEY: battery_status,
+                DATA_CLIMATE_STATUS_KEY: climate_status,
+            }
 
     async def async_set_title(self, value: str) -> Any:
         """Get data from the API."""

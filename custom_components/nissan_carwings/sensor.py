@@ -11,6 +11,8 @@ from homeassistant.helpers.icon import icon_for_battery_level
 from homeassistant.util.unit_conversion import DistanceConverter
 from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
+from custom_components.nissan_carwings.const import DATA_BATTERY_STATUS_KEY
+
 from .entity import NissanCarwingsEntity
 
 if TYPE_CHECKING:
@@ -55,18 +57,20 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def native_value(self) -> str | None:
         """Return the native value of the sensor."""
-        return round(self.coordinator.data["battery_status"].battery_percent)
+        return round(self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent)
 
     @property
     def icon(self) -> str:
         """Battery state icon handling."""
-        charging = self.coordinator.data["battery_status"].is_charging
+        charging = self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging
         return icon_for_battery_level(battery_level=self.state, charging=charging)
 
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return self.coordinator.data["battery_status"].battery_percent is not None
+        return (
+            self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent is not None
+        )
 
 
 class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
@@ -92,9 +96,11 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
         """Battery range in miles or kms."""
         ret: float | None
         if self._ac_on:
-            ret = self.coordinator.data["battery_status"].cruising_range_ac_on_km
+            ret = self.coordinator.data[DATA_BATTERY_STATUS_KEY].cruising_range_ac_on_km
         else:
-            ret = self.coordinator.data["battery_status"].cruising_range_ac_off_km
+            ret = self.coordinator.data[
+                DATA_BATTERY_STATUS_KEY
+            ].cruising_range_ac_off_km
 
         if ret is None:
             return None
@@ -132,7 +138,7 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
     def available(self) -> bool:
         """Sensor availability."""
         return (
-            self.coordinator.data["battery_status"].battery_remaining_amount_wh
+            self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh
             is not None
         )
 
@@ -140,5 +146,5 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
         return float(
-            self.coordinator.data["battery_status"].battery_remaining_amount_wh
+            self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh
         )

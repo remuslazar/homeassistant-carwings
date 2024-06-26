@@ -10,6 +10,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
+from custom_components.nissan_carwings.const import DATA_BATTERY_STATUS_KEY
+
 from .entity import NissanCarwingsEntity
 
 if TYPE_CHECKING:
@@ -50,12 +52,12 @@ class LeafPluggedInSensor(NissanCarwingsEntity, BinarySensorEntity):
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return self.coordinator.data["battery_status"].is_connected is not None
+        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_connected is not None
 
     @property
     def is_on(self) -> bool:
         """Return true if plugged in."""
-        return bool(self.coordinator.data["battery_status"].is_connected)
+        return bool(self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_connected)
 
 
 class LeafChargingSensor(NissanCarwingsEntity, BinarySensorEntity):
@@ -74,9 +76,9 @@ class LeafChargingSensor(NissanCarwingsEntity, BinarySensorEntity):
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return self.coordinator.data["battery_status"].is_charging is not None
+        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging is not None
 
     @property
     def is_on(self) -> bool:
         """Return true if charging."""
-        return bool(self.coordinator.data["battery_status"].is_charging)
+        return bool(self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging)
