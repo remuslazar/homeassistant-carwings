@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 import pycarwings3
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from pytz import UTC
 
 from custom_components.nissan_carwings.const import DATA_BATTERY_STATUS_KEY
 
@@ -52,7 +53,7 @@ class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
 
         return {
             "VIN": self.coordinator.config_entry.data["vin"],
-            "timestamp": data.timestamp
+            "timestamp": data.timestamp.astimezone(tz=UTC)
             if data and hasattr(data, "timestamp")
             else None,
         }
