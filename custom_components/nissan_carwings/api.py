@@ -61,6 +61,8 @@ class NissanCarwingsApiClient:
     # False if it should be turned off
     climate_control_pending_state = None
 
+    is_update_in_progress = False
+
     def __init__(
         self,
         username: str,
@@ -103,6 +105,7 @@ class NissanCarwingsApiClient:
 
     async def async_update_data(self) -> Any:
         """Update data from the API."""
+        self.is_update_in_progress = True
         response = await self._carwings3.get_leaf()
         LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
         result_key = await response.request_update()
@@ -128,6 +131,9 @@ class NissanCarwingsApiClient:
                 "carwings3.get_status_from_update() failed: vin=%s", response.vin
             )
             raise NissanCarwingsApiUpdateTimeoutError
+
+        # finally
+        self.is_update_in_progress = False
 
     async def async_get_data(self) -> Any:
         """Get data from the API."""
