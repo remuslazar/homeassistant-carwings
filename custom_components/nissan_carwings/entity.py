@@ -2,28 +2,25 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-import pycarwings3
 from homeassistant.helpers.device_registry import DeviceInfo
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from pytz import UTC
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+)
 
-from custom_components.nissan_carwings.const import DATA_BATTERY_STATUS_KEY
+from custom_components.nissan_carwings.const import DATA_TIMESTAMP_KEY
 
-from .coordinator import CarwingsDataUpdateCoordinator
-
-if TYPE_CHECKING:
-    import pycarwings3.responses
+from .coordinator import CarwingsBaseDataUpdateCoordinator
 
 
-class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
+class NissanCarwingsEntity(CoordinatorEntity[CarwingsBaseDataUpdateCoordinator]):
     """CarwingsEntity class."""
 
     # a prefix to be prepended to the unique_id of each entity
     unique_id_prefix: str
 
-    def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
+    def __init__(self, coordinator: CarwingsBaseDataUpdateCoordinator) -> None:
         """Initialize."""
         super().__init__(coordinator)
         # see https://developers.home-assistant.io/blog/2022/07/10/entity_naming/
@@ -47,13 +44,8 @@ class NissanCarwingsEntity(CoordinatorEntity[CarwingsDataUpdateCoordinator]):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return default attributes for Nissan leaf entities."""
-        data: pycarwings3.responses.CarwingsLatestBatteryStatusResponse = (
-            self.coordinator.data[DATA_BATTERY_STATUS_KEY]
-        )
 
         return {
             "VIN": self.coordinator.config_entry.data["vin"],
-            "timestamp": data.timestamp.astimezone(tz=UTC)
-            if data and hasattr(data, "timestamp")
-            else None,
+            "timestamp": self.coordinator.data.get(DATA_TIMESTAMP_KEY),
         }

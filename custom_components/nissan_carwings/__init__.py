@@ -14,7 +14,10 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
 from .api import NissanCarwingsApiClient
-from .coordinator import CarwingsDataUpdateCoordinator
+from .coordinator import (
+    CarwingsClimateDataUpdateCoordinator,
+    CarwingsDataUpdateCoordinator,
+)
 from .data import NissanCarwingsData
 
 if TYPE_CHECKING:
@@ -40,6 +43,10 @@ async def async_setup_entry(
         hass=hass,
         config_entry=entry,
     )
+    climate_coordinator = CarwingsClimateDataUpdateCoordinator(
+        hass=hass,
+        config_entry=entry,
+    )
     entry.runtime_data = NissanCarwingsData(
         client=NissanCarwingsApiClient(
             username=entry.data[CONF_USERNAME],
@@ -49,10 +56,12 @@ async def async_setup_entry(
         ),
         integration=async_get_loaded_integration(hass, entry.domain),
         coordinator=coordinator,
+        climate_coordinator=climate_coordinator,
     )
 
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
     await coordinator.async_config_entry_first_refresh()
+    await climate_coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))

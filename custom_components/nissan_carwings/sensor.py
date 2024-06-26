@@ -68,17 +68,13 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return (
-            self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent is not None
-        )
+        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent is not None
 
 
 class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
     """Remaining Range Sensor."""
 
-    def __init__(
-        self, coordinator: CarwingsDataUpdateCoordinator, *, is_ac_on: bool
-    ) -> None:
+    def __init__(self, coordinator: CarwingsDataUpdateCoordinator, *, is_ac_on: bool) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
         self._ac_on = is_ac_on
@@ -98,17 +94,13 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
         if self._ac_on:
             ret = self.coordinator.data[DATA_BATTERY_STATUS_KEY].cruising_range_ac_on_km
         else:
-            ret = self.coordinator.data[
-                DATA_BATTERY_STATUS_KEY
-            ].cruising_range_ac_off_km
+            ret = self.coordinator.data[DATA_BATTERY_STATUS_KEY].cruising_range_ac_off_km
 
         if ret is None:
             return None
 
         if self.hass.config.units is US_CUSTOMARY_SYSTEM:
-            ret = DistanceConverter.convert(
-                ret, UnitOfLength.KILOMETERS, UnitOfLength.MILES
-            )
+            ret = DistanceConverter.convert(ret, UnitOfLength.KILOMETERS, UnitOfLength.MILES)
 
         return round(ret)
 
@@ -138,14 +130,9 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return (
-            self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh
-            is not None
-        )
+        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh is not None
 
     @property
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
-        return float(
-            self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh
-        )
+        return float(self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh)

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 
-from custom_components.nissan_carwings.const import DATA_CLIMATE_STATUS_KEY, LOGGER
+from custom_components.nissan_carwings.const import DATA_CLIMATE_STATUS_KEY
 
 from .entity import NissanCarwingsEntity
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-    from .coordinator import CarwingsDataUpdateCoordinator
+    from .coordinator import CarwingsClimateDataUpdateCoordinator
     from .data import NissanCarwingsConfigEntry
 
 
@@ -27,7 +27,7 @@ async def async_setup_entry(
     """Set up the switch platform."""
     async_add_entities(
         [
-            ClimateControlSwitch(coordinator=entry.runtime_data.coordinator),
+            ClimateControlSwitch(coordinator=entry.runtime_data.climate_coordinator),
         ]
     )
 
@@ -37,13 +37,11 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
 
     def __init__(
         self,
-        coordinator: CarwingsDataUpdateCoordinator,
+        coordinator: CarwingsClimateDataUpdateCoordinator,
     ) -> None:
         """Initialize the switch class."""
         super().__init__(coordinator)
-        self.entity_description = SwitchEntityDescription(
-            key="ac_control", name="AC Control"
-        )
+        self.entity_description = SwitchEntityDescription(key="ac_control", name="AC Control")
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
     @property
@@ -54,9 +52,9 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
         if client.climate_control_pending_state is not None:
             return client.climate_control_pending_state
 
-        data: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = (
-            self.coordinator.data[DATA_CLIMATE_STATUS_KEY]
-        )
+        data: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
+            DATA_CLIMATE_STATUS_KEY
+        ]
         return data.is_hvac_running
 
     async def async_turn_on(self, **_: Any) -> None:
@@ -78,7 +76,4 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Switch availability."""
-        return (
-            self.coordinator.config_entry.runtime_data.client.climate_control_pending_state
-            is None
-        )
+        return self.coordinator.config_entry.runtime_data.client.climate_control_pending_state is None

@@ -11,6 +11,7 @@ import pycarwings3.responses
 from custom_components.nissan_carwings.const import (
     DATA_BATTERY_STATUS_KEY,
     DATA_CLIMATE_STATUS_KEY,
+    DATA_TIMESTAMP_KEY,
     LOGGER,
     PYCARWINGS_MAX_RESPONSE_ATTEMPTS,
     PYCARWINGS_SLEEP,
@@ -75,9 +76,7 @@ class NissanCarwingsApiClient:
         self._password = password
         self._region = region
         self._session = session
-        self._carwings3 = pycarwings3.Session(
-            username, password, region, session=session, base_url=BASE_URL
-        )
+        self._carwings3 = pycarwings3.Session(username, password, region, session=session, base_url=BASE_URL)
 
     async def async_test_credentials(self) -> dict[str, str]:
         """
@@ -127,9 +126,7 @@ class NissanCarwingsApiClient:
                 )
                 break
         else:
-            LOGGER.error(
-                "carwings3.get_status_from_update() failed: vin=%s", response.vin
-            )
+            LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
             raise NissanCarwingsApiUpdateTimeoutError
 
         # finally
@@ -145,10 +142,25 @@ class NissanCarwingsApiClient:
             ) = await response.get_latest_battery_status()
             if battery_status:
                 LOGGER.debug(
-                    "carwings3.get_latest_battery_status() OK: SOC={:.0f}%".format(
-                        battery_status.battery_percent
-                    )  # noqa: E501
+                    f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%"  # noqa: E501
                 )
+
+        except pycarwings3.CarwingsError as exception:
+            msg = f"Error fetching data - {exception}"
+            raise NissanCarwingsApiClientError(
+                msg,
+            ) from exception
+        else:
+            return {
+                DATA_BATTERY_STATUS_KEY: battery_status,
+                DATA_TIMESTAMP_KEY: battery_status.timestamp if battery_status else None,
+            }
+
+    async def async_get_climate_data(self) -> Any:
+        """Get data from the API."""
+        try:
+            response = await self._carwings3.get_leaf()
+            LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
             climate_status: (
                 pycarwings3.responses.CarwingsLatestClimateControlStatusResponse | None
             ) = await response.get_latest_hvac_status()
@@ -164,8 +176,8 @@ class NissanCarwingsApiClient:
             ) from exception
         else:
             return {
-                DATA_BATTERY_STATUS_KEY: battery_status,
                 DATA_CLIMATE_STATUS_KEY: climate_status,
+                DATA_TIMESTAMP_KEY: climate_status.timestamp if climate_status else None,
             }
 
     async def async_set_climate(self, *, switch_on: bool = True) -> Any:
@@ -175,14 +187,8 @@ class NissanCarwingsApiClient:
         response = await self._carwings3.get_leaf()
         LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
 
-        result_key = (
-            await response.start_climate_control()
-            if switch_on
-            else await response.stop_climate_control()
-        )
-        LOGGER.debug(
-            "carwings3.start/stop_climate_control() OK: resultKey=%s", result_key
-        )
+        result_key = await response.start_climate_control() if switch_on else await response.stop_climate_control()
+        LOGGER.debug("carwings3.start/stop_climate_control() OK: resultKey=%s", result_key)
         for attempt in range(PYCARWINGS_MAX_RESPONSE_ATTEMPTS):
             status = (
                 await response.get_start_climate_control_result(result_key)
@@ -204,9 +210,7 @@ class NissanCarwingsApiClient:
                 )
                 break
         else:
-            LOGGER.error(
-                "carwings3.get_status_from_update() failed: vin=%s", response.vin
-            )
+            LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
             raise NissanCarwingsApiUpdateTimeoutError
 
         self.climate_control_pending_state = None

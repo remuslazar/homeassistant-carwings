@@ -10,7 +10,10 @@ if TYPE_CHECKING:
     from homeassistant.loader import Integration
 
     from .api import NissanCarwingsApiClient
-    from .coordinator import CarwingsDataUpdateCoordinator
+    from .coordinator import (
+        CarwingsClimateDataUpdateCoordinator,
+        CarwingsDataUpdateCoordinator,
+    )
 
 
 type NissanCarwingsConfigEntry = ConfigEntry[NissanCarwingsData]
@@ -22,4 +25,5 @@ class NissanCarwingsData:
 
     client: NissanCarwingsApiClient
     coordinator: CarwingsDataUpdateCoordinator
+    climate_coordinator: CarwingsClimateDataUpdateCoordinator
     integration: Integration
