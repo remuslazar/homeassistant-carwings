@@ -26,7 +26,7 @@ class CarwingsDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     config_entry: NissanCarwingsConfigEntry
-    is_first_update = True
+    request_update = False
 
     def __init__(
         self,
@@ -51,10 +51,11 @@ class CarwingsDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> Any:
         """Update data via library."""
         try:
-            if self.is_first_update:
-                self.is_first_update = False
-            else:
+            # request an update if the user has requested it (and wait for it to complete)  # noqa: E501
+            if self.request_update:
+                self.request_update = False
                 await self.config_entry.runtime_data.client.async_update_data()
+
             return await self.config_entry.runtime_data.client.async_get_data()
         except NissanCarwingsApiUpdateTimeoutError as exception:
             raise UpdateFailed(exception) from exception

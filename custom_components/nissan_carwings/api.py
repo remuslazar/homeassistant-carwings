@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from operator import is_
 from typing import TYPE_CHECKING, Any
 
 import pycarwings3
@@ -55,6 +56,11 @@ def _verify_response_or_raise(response: aiohttp.ClientResponse) -> None:
 
 class NissanCarwingsApiClient:
     """Nissan Carwings API Client."""
+
+    # pending state for the climate control:
+    # None if no change is pending, True if it should be turned on
+    # False if it should be turned off
+    climate_control_pending_state = None
 
     def __init__(
         self,
@@ -134,7 +140,9 @@ class NissanCarwingsApiClient:
             ) = await response.get_latest_battery_status()
             if battery_status:
                 LOGGER.debug(
-                    f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%",  # noqa: E501
+                    "carwings3.get_latest_battery_status() OK: SOC={:.0f}%".format(
+                        battery_status.battery_percent
+                    )  # noqa: E501
                 )
             climate_status: (
                 pycarwings3.responses.CarwingsLatestClimateControlStatusResponse | None
@@ -154,3 +162,46 @@ class NissanCarwingsApiClient:
                 DATA_BATTERY_STATUS_KEY: battery_status,
                 DATA_CLIMATE_STATUS_KEY: climate_status,
             }
+
+    async def async_set_climate(self, *, switch_on: bool = True) -> Any:
+        """Set climate control."""
+        self.climate_control_pending_state = switch_on
+
+        response = await self._carwings3.get_leaf()
+        LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
+
+        result_key = (
+            await response.start_climate_control()
+            if switch_on
+            else await response.stop_climate_control()
+        )
+        LOGGER.debug(
+            "carwings3.start/stop_climate_control() OK: resultKey=%s", result_key
+        )
+        for attempt in range(PYCARWINGS_MAX_RESPONSE_ATTEMPTS):
+            status = (
+                await response.get_start_climate_control_result(result_key)
+                if switch_on
+                else await response.get_stop_climate_control_result(result_key)
+            )
+            LOGGER.debug(
+                "Waiting %s seconds for climate status update (%s) (%s)",
+                PYCARWINGS_SLEEP,
+                response.vin,
+                attempt,
+            )
+            await asyncio.sleep(PYCARWINGS_SLEEP)
+
+            if status is not None:
+                LOGGER.debug(
+                    "carwings3.get_climate_status_from_update() OK: timestamp=%s",
+                    status.timestamp,
+                )
+                break
+        else:
+            LOGGER.error(
+                "carwings3.get_status_from_update() failed: vin=%s", response.vin
+            )
+            raise NissanCarwingsApiUpdateTimeoutError
+
+        self.climate_control_pending_state = None

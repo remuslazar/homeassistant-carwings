@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 
-from custom_components.nissan_carwings.const import DATA_CLIMATE_STATUS_KEY
+from custom_components.nissan_carwings.const import DATA_CLIMATE_STATUS_KEY, LOGGER
 
 from .entity import NissanCarwingsEntity
 
@@ -49,6 +49,11 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return true if the switch is on."""
+        client = self.coordinator.config_entry.runtime_data.client
+        # respect the pending state
+        if client.climate_control_pending_state is not None:
+            return client.climate_control_pending_state
+
         data: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = (
             self.coordinator.data[DATA_CLIMATE_STATUS_KEY]
         )
@@ -56,8 +61,28 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""
+        client = self.coordinator.config_entry.runtime_data.client
+        client.climate_control_pending_state = True
+        await self.async_update_ha_state()
+        await client.async_set_climate(switch_on=True)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **_: Any) -> None:
         """Turn off the switch."""
+        client = self.coordinator.config_entry.runtime_data.client
+        client.climate_control_pending_state = False
+        await self.async_update_ha_state()
+        await client.async_set_climate(switch_on=False)
         await self.coordinator.async_request_refresh()
+
+    @property
+    def available(self) -> bool:
+        """Switch availability."""
+        LOGGER.debug(
+            "ClimateControlSwitch pending state: %s",
+            self.coordinator.config_entry.runtime_data.client.climate_control_pending_state,
+        )
+        return (
+            self.coordinator.config_entry.runtime_data.client.climate_control_pending_state
+            is None
+        )
