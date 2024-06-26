@@ -3,11 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-import socket
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import aiohttp
-import async_timeout
 import pycarwings3
 import pycarwings3.responses
 
@@ -18,6 +15,9 @@ from custom_components.nissan_carwings.const import (
     PYCARWINGS_MAX_RESPONSE_ATTEMPTS,
     PYCARWINGS_SLEEP,
 )
+
+if TYPE_CHECKING:
+    import aiohttp
 
 # TODO: make this configurable for development
 BASE_URL = "https://carwings-simulator.herokuapp.com/api/"
@@ -154,47 +154,3 @@ class NissanCarwingsApiClient:
                 DATA_BATTERY_STATUS_KEY: battery_status,
                 DATA_CLIMATE_STATUS_KEY: climate_status,
             }
-
-    async def async_set_title(self, value: str) -> Any:
-        """Get data from the API."""
-        return await self._api_wrapper(
-            method="patch",
-            url="https://jsonplaceholder.typicode.com/posts/1",
-            data={"title": value},
-            headers={"Content-type": "application/json; charset=UTF-8"},
-        )
-
-    async def _api_wrapper(
-        self,
-        method: str,
-        url: str,
-        data: dict | None = None,
-        headers: dict | None = None,
-    ) -> Any:
-        """Get information from the API."""
-        try:
-            async with async_timeout.timeout(10):
-                response = await self._session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    json=data,
-                )
-                _verify_response_or_raise(response)
-                return await response.json()
-
-        except TimeoutError as exception:
-            msg = f"Timeout error fetching information - {exception}"
-            raise NissanCarwingsApiClientCommunicationError(
-                msg,
-            ) from exception
-        except (aiohttp.ClientError, socket.gaierror) as exception:
-            msg = f"Error fetching information - {exception}"
-            raise NissanCarwingsApiClientCommunicationError(
-                msg,
-            ) from exception
-        except Exception as exception:  # pylint: disable=broad-except
-            msg = f"Something really wrong happened! - {exception}"
-            raise NissanCarwingsApiClientError(
-                msg,
-            ) from exception
