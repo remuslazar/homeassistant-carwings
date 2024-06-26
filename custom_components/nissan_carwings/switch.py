@@ -78,10 +78,6 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Switch availability."""
-        LOGGER.debug(
-            "ClimateControlSwitch pending state: %s",
-            self.coordinator.config_entry.runtime_data.client.climate_control_pending_state,
-        )
         return (
             self.coordinator.config_entry.runtime_data.client.climate_control_pending_state
             is None
