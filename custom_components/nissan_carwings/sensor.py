@@ -48,7 +48,7 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
         super().__init__(coordinator)
         self.entity_description = SensorEntityDescription(
             key="battery_soc",
-            name="Battery SOC",
+            name="Battery",
             device_class=SensorDeviceClass.BATTERY,
             native_unit_of_measurement=PERCENTAGE,
         )
@@ -84,7 +84,7 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
         self._ac_on = is_ac_on
         self.entity_description = SensorEntityDescription(
             key="range_ac_on" if is_ac_on else "range_ac_off",
-            name="Remaining Range (AC)" if is_ac_on else "Remaining Range",
+            name="Range (AC)" if is_ac_on else "Range",
             device_class=SensorDeviceClass.DISTANCE,
             native_unit_of_measurement=PERCENTAGE,
         )

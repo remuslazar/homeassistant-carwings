@@ -68,7 +68,7 @@ class LeafChargingSensor(NissanCarwingsEntity, BinarySensorEntity):
         super().__init__(coordinator)
         self.entity_description = BinarySensorEntityDescription(
             key="charging_status",
-            name="Charging Status",
+            name="Charging",
             device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
         )
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
