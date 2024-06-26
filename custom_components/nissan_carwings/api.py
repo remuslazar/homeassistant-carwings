@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-from operator import is_
 from typing import TYPE_CHECKING, Any
 
 import pycarwings3
