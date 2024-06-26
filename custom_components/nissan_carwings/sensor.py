@@ -131,6 +131,7 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
             name="Battery Capacity",
             device_class=SensorDeviceClass.ENERGY_STORAGE,
             native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+            entity_registry_enabled_default=False,  # Sensor not enabled by default
         )
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
