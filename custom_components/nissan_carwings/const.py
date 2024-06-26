@@ -13,4 +13,5 @@ OPTIONS_UPDATE_INTERVAL = "update_interval"
 
 DATA_BATTERY_STATUS_KEY = "battery_status"
 DATA_CLIMATE_STATUS_KEY = "climate_status"
+DATA_DRIVING_ANALYSIS_KEY = "driving_analysis"
 DATA_TIMESTAMP_KEY = "timestamp"

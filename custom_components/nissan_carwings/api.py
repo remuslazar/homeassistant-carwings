@@ -11,6 +11,7 @@ import pycarwings3.responses
 from custom_components.nissan_carwings.const import (
     DATA_BATTERY_STATUS_KEY,
     DATA_CLIMATE_STATUS_KEY,
+    DATA_DRIVING_ANALYSIS_KEY,
     DATA_TIMESTAMP_KEY,
     LOGGER,
     PYCARWINGS_MAX_RESPONSE_ATTEMPTS,
@@ -214,3 +215,25 @@ class NissanCarwingsApiClient:
             raise NissanCarwingsApiUpdateTimeoutError
 
         self.climate_control_pending_state = None
+
+    async def async_get_driving_analysis_data(self) -> Any:
+        """Get data from the API."""
+        try:
+            response = await self._carwings3.get_leaf()
+            LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
+            driving_analysis: (
+                pycarwings3.responses.CarwingsDrivingAnalysisResponse | None
+            ) = await response.get_driving_analysis()
+            if driving_analysis:
+                LOGGER.debug(f"carwings3.get_drive_analysis() OK: {driving_analysis}")
+
+        except pycarwings3.CarwingsError as exception:
+            msg = f"Error fetching data - {exception}"
+            raise NissanCarwingsApiClientError(
+                msg,
+            ) from exception
+        else:
+            return {
+                DATA_DRIVING_ANALYSIS_KEY: driving_analysis,
+                DATA_TIMESTAMP_KEY: None,
+            }

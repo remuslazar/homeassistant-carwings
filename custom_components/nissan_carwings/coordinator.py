@@ -74,3 +74,18 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             raise ConfigEntryAuthFailed(exception) from exception
         except NissanCarwingsApiClientError as exception:
             raise UpdateFailed(exception) from exception
+
+
+class CarwingsDrivingAnalysisDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
+    """Class to manage fetching data from the API."""
+
+    async def _async_update_data(self) -> Any:
+        """Update data via library."""
+        try:
+            return await self.config_entry.runtime_data.client.async_get_driving_analysis_data()
+        except NissanCarwingsApiUpdateTimeoutError as exception:
+            raise UpdateFailed(exception) from exception
+        except NissanCarwingsApiClientAuthenticationError as exception:
+            raise ConfigEntryAuthFailed(exception) from exception
+        except NissanCarwingsApiClientError as exception:
+            raise UpdateFailed(exception) from exception
