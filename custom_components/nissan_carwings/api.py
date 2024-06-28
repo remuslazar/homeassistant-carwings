@@ -235,5 +235,5 @@ class NissanCarwingsApiClient:
         else:
             return {
                 DATA_DRIVING_ANALYSIS_KEY: driving_analysis,
-                DATA_TIMESTAMP_KEY: None,
+                DATA_TIMESTAMP_KEY: None,  # unfortunately there is no timestamp info in the response
             }

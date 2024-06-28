@@ -198,6 +198,5 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
 
         return {
             "VIN": self.coordinator.config_entry.data["vin"],
-            "timestamp": self.coordinator.data.get(DATA_TIMESTAMP_KEY),
             **self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY].__dict__,
         }

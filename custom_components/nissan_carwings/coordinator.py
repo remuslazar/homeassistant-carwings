@@ -30,6 +30,7 @@ class CarwingsBaseDataUpdateCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         config_entry: NissanCarwingsConfigEntry,
+        always_update: bool = True,
     ) -> None:
         """Initialize."""
         super().__init__(
@@ -37,6 +38,7 @@ class CarwingsBaseDataUpdateCoordinator(DataUpdateCoordinator):
             logger=LOGGER,
             name=DOMAIN,
             update_interval=timedelta(seconds=config_entry.options.get(OPTIONS_UPDATE_INTERVAL, 300)),
+            always_update=always_update,
         )
         self.config_entry = config_entry
         LOGGER.debug(
@@ -78,6 +80,18 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
 
 class CarwingsDrivingAnalysisDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
     """Class to manage fetching data from the API."""
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        config_entry: NissanCarwingsConfigEntry,
+    ) -> None:
+        """Initialize."""
+        super().__init__(
+            hass=hass,
+            config_entry=config_entry,
+            always_update=False,
+        )
 
     async def _async_update_data(self) -> Any:
         """Update data via library."""
