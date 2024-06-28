@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from .coordinator import (
         CarwingsClimateDataUpdateCoordinator,
         CarwingsDataUpdateCoordinator,
+        CarwingsDrivingAnalysisDataUpdateCoordinator,
     )
 
 
@@ -26,4 +27,5 @@ class NissanCarwingsData:
     client: NissanCarwingsApiClient
     coordinator: CarwingsDataUpdateCoordinator
     climate_coordinator: CarwingsClimateDataUpdateCoordinator
+    driving_analysis_coordinator: CarwingsDrivingAnalysisDataUpdateCoordinator
     integration: Integration
