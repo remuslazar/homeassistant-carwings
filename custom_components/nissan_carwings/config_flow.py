@@ -39,6 +39,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     region=user_input[CONF_REGION],
                 )
             except NissanCarwingsApiClientAuthenticationError as exception:
+                LOGGER.error('Authentication error: "%s"', exception)
                 LOGGER.warning(exception)
                 _errors["base"] = "auth"
             except NissanCarwingsApiClientCommunicationError as exception:
@@ -71,9 +72,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             type=selector.TextSelectorType.PASSWORD,
                         ),
                     ),
-                    vol.Required(
-                        CONF_REGION, description="Region"
-                    ): selector.SelectSelector(
+                    vol.Required(CONF_REGION, description="Region"): selector.SelectSelector(
                         {
                             "options": [
                                 {"value": "NE", "label": "NE (Europe)"},
@@ -89,9 +88,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             errors=_errors,
         )
 
-    async def _test_credentials(
-        self, username: str, password: str, region: str
-    ) -> dict[str, str]:
+    async def _test_credentials(self, username: str, password: str, region: str) -> dict[str, str]:
         """Validate credentials."""
         client = NissanCarwingsApiClient(
             username=username,

@@ -96,6 +96,12 @@ class NissanCarwingsApiClient:
 
         except pycarwings3.CarwingsError as exception:
             msg = f"Error fetching information - {exception}"
+            if str(exception) == "INVALID PARAMS":
+                raise NissanCarwingsApiClientAuthenticationError(
+                    msg,
+                ) from exception
+
+            # default
             raise NissanCarwingsApiClientError(
                 msg,
             ) from exception

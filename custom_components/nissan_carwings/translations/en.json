@@ -11,7 +11,7 @@
             }
         },
         "error": {
-            "auth": "Username/Password is wrong.",
+            "auth": "Authentication failed. Please check your credentials.",
             "connection": "Unable to connect to the server.",
             "unknown": "Unknown error occurred."
         }
