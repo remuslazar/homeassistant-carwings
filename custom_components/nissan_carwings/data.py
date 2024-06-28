@@ -5,8 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from custom_components.nissan_carwings.coordinator import CarwingsDrivingAnalysisDataUpdateCoordinator
-
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
@@ -15,6 +13,7 @@ if TYPE_CHECKING:
     from .coordinator import (
         CarwingsClimateDataUpdateCoordinator,
         CarwingsDataUpdateCoordinator,
+        CarwingsDrivingAnalysisDataUpdateCoordinator,
     )
 
 
