@@ -196,7 +196,17 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return default attributes for Nissan leaf entities."""
 
+        # flatten the advice property
+        try:
+            driving_analysis: dict[str, Any] = self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY].__dict__
+            first_advice = driving_analysis["advice"][0]
+            driving_analysis["advice_title"] = first_advice["title"]
+            driving_analysis["advice_body"] = first_advice["body"]
+            del driving_analysis["advice"]
+        except (KeyError, IndexError):
+            driving_analysis = self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY].__dict__
+
         return {
             "VIN": self.coordinator.config_entry.data["vin"],
-            **self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY].__dict__,
+            **driving_analysis,
         }
