@@ -11,6 +11,6 @@
   "issue_tracker": "https://github.com/remuslazar/homeassistant-carwings/issues",
   "version": "0.0.0",
   "requirements": [
-    "pycarwings3 @ git+https://github.com/ev-freaks/pycarwings3.git@master"
+    "pycarwings3@git+https://github.com/ev-freaks/pycarwings3.git@master"
   ]
 }
