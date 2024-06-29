@@ -241,7 +241,9 @@ class NissanCarwingsApiClient:
                 pycarwings3.responses.CarwingsDrivingAnalysisResponse | None
             ) = await response.get_driving_analysis()
             if driving_analysis:
-                LOGGER.debug(f"carwings3.get_drive_analysis() OK: {driving_analysis}")
+                LOGGER.debug(
+                    f"carwings3.get_drive_analysis() OK; target_date={driving_analysis.target_date}, mileage={driving_analysis.electric_mileage}"
+                )
 
         except pycarwings3.CarwingsError as exception:
             msg = f"Error fetching data - {exception}"
