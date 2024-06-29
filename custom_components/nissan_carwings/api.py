@@ -61,6 +61,7 @@ class NissanCarwingsApiClient:
     climate_control_pending_state = None
 
     is_update_in_progress = False
+    update_semaphore = asyncio.Semaphore(1)
 
     def __init__(
         self,
@@ -119,35 +120,46 @@ class NissanCarwingsApiClient:
         else:
             return {"vin": response.vin, "nickname": response.nickname}
 
-    async def async_update_data(self) -> Any:
+    async def async_update_data(self):
         """Update data from the API."""
-        self.is_update_in_progress = True
-        response = await self._carwings3.get_leaf()
-        LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
-        result_key = await response.request_update()
-        LOGGER.debug("carwings3.request_update() OK: resultKey=%s", result_key)
-        for attempt in range(PYCARWINGS_MAX_RESPONSE_ATTEMPTS):
-            status = await response.get_status_from_update(result_key)
-            LOGGER.debug(
-                "Waiting %s seconds for battery update (%s) (%s)",
-                PYCARWINGS_SLEEP,
-                response.vin,
-                attempt,
-            )
-            await asyncio.sleep(PYCARWINGS_SLEEP)
 
-            if status is not None:
-                LOGGER.debug(
-                    "carwings3.get_status_from_update() OK: timestamp=%s",
-                    status.timestamp,
-                )
-                break
+        # prevent concurrent updates
+        if self.update_semaphore.locked():
+            LOGGER.warning("async_update_data(): previous update is currently in progress, waiting for it to finish.")
+            return_after_release = True
         else:
-            LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
-            raise NissanCarwingsApiUpdateTimeoutError
+            return_after_release = False
 
-        # finally
-        self.is_update_in_progress = False
+        async with self.update_semaphore:
+            if return_after_release:
+                return
+            self.is_update_in_progress = True
+            response = await self._carwings3.get_leaf()
+            LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
+            result_key = await response.request_update()
+            LOGGER.debug("carwings3.request_update() OK: resultKey=%s", result_key)
+            for attempt in range(PYCARWINGS_MAX_RESPONSE_ATTEMPTS):
+                status = await response.get_status_from_update(result_key)
+                LOGGER.debug(
+                    "Waiting %s seconds for battery update (%s) (%s)",
+                    PYCARWINGS_SLEEP,
+                    response.vin,
+                    attempt,
+                )
+                await asyncio.sleep(PYCARWINGS_SLEEP)
+
+                if status is not None:
+                    LOGGER.debug(
+                        "carwings3.get_status_from_update() OK: timestamp=%s",
+                        status.timestamp,
+                    )
+                    break
+            else:
+                LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
+                raise NissanCarwingsApiUpdateTimeoutError
+
+            # finally
+            self.is_update_in_progress = False
 
     async def async_get_data(self) -> Any:
         """Get data from the API."""
