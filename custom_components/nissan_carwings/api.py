@@ -21,9 +21,6 @@ from custom_components.nissan_carwings.const import (
 if TYPE_CHECKING:
     import aiohttp
 
-# TODO: make this configurable for development
-BASE_URL = "https://carwings-simulator.herokuapp.com/api/"
-
 
 class NissanCarwingsApiClientError(Exception):
     """Exception to indicate a general API error."""
@@ -71,13 +68,25 @@ class NissanCarwingsApiClient:
         password: str,
         region: str,
         session: aiohttp.ClientSession,
+        base_url: str | None,
     ) -> None:
         """Sample API Client."""
         self._username = username
         self._password = password
         self._region = region
         self._session = session
-        self._carwings3 = pycarwings3.Session(username, password, region, session=session, base_url=BASE_URL)
+
+        if base_url:
+            # use the custom base_url the user has provided via
+            self._carwings3 = pycarwings3.Session(
+                username,
+                password,
+                region,
+                session=session,
+                base_url=base_url,
+            )
+        else:
+            self._carwings3 = pycarwings3.Session(username, password, region, session=session)
 
     async def async_test_credentials(self) -> dict[str, str]:
         """
@@ -97,6 +106,7 @@ class NissanCarwingsApiClient:
         except pycarwings3.CarwingsError as exception:
             msg = f"Error fetching information - {exception}"
             if str(exception) == "INVALID PARAMS":
+                LOGGER.error("Login failed: username=%s, region=%s", self._username, self._region)
                 raise NissanCarwingsApiClientAuthenticationError(
                     msg,
                 ) from exception

@@ -17,7 +17,7 @@ from .api import (
     NissanCarwingsApiClientCommunicationError,
     NissanCarwingsApiClientError,
 )
-from .const import DOMAIN, LOGGER
+from .const import CONF_PYCARWINGS3_BASE_URL, DOMAIN, LOGGER
 
 
 class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -37,6 +37,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     username=user_input[CONF_USERNAME],
                     password=user_input[CONF_PASSWORD],
                     region=user_input[CONF_REGION],
+                    base_url=user_input.get(CONF_PYCARWINGS3_BASE_URL),
                 )
             except NissanCarwingsApiClientAuthenticationError as exception:
                 LOGGER.error('Authentication error: "%s"', exception)
@@ -83,18 +84,26 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             ]
                         }
                     ),
+                    vol.Optional(CONF_PYCARWINGS3_BASE_URL, description="base_url"): selector.TextSelector(
+                        selector.TextSelectorConfig(
+                            type=selector.TextSelectorType.TEXT,
+                        ),
+                    ),
                 },
             ),
             errors=_errors,
         )
 
-    async def _test_credentials(self, username: str, password: str, region: str) -> dict[str, str]:
+    async def _test_credentials(
+        self, username: str, password: str, region: str, base_url: str | None
+    ) -> dict[str, str]:
         """Validate credentials."""
         client = NissanCarwingsApiClient(
             username=username,
             password=password,
             region=region,
             session=async_create_clientsession(self.hass),
+            base_url=base_url,
         )
         return await client.async_test_credentials()
 

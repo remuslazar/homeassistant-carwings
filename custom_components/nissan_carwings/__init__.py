@@ -13,6 +13,8 @@ from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME, Platf
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
+from custom_components.nissan_carwings.const import CONF_PYCARWINGS3_BASE_URL
+
 from .api import NissanCarwingsApiClient
 from .coordinator import (
     CarwingsClimateDataUpdateCoordinator,
@@ -58,6 +60,7 @@ async def async_setup_entry(
             password=entry.data[CONF_PASSWORD],
             region=entry.data[CONF_REGION],
             session=async_get_clientsession(hass),
+            base_url=entry.data.get(CONF_PYCARWINGS3_BASE_URL),
         ),
         integration=async_get_loaded_integration(hass, entry.domain),
         coordinator=coordinator,

@@ -2,11 +2,12 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/remuslazar/homeassistant-carwings",
+                "description": "Enter your Nissan Connect credentials to proceed. Leave the Base URL field empty to use the default Nissan Connect API endpoint.",
                 "data": {
                     "username": "Username",
                     "password": "Password",
-                    "region": "Region"
+                    "region": "Region",
+                    "pycarwings3_base_url": "BASE_URL"
                 }
             }
         },
