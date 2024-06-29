@@ -13,7 +13,7 @@ from .api import (
     NissanCarwingsApiClientError,
     NissanCarwingsApiUpdateTimeoutError,
 )
-from .const import DOMAIN, LOGGER, OPTIONS_UPDATE_INTERVAL
+from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN, LOGGER, OPTIONS_UPDATE_INTERVAL
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -37,10 +37,13 @@ class CarwingsBaseDataUpdateCoordinator(DataUpdateCoordinator):
             hass=hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=config_entry.options.get(OPTIONS_UPDATE_INTERVAL, 300)),
+            update_interval=timedelta(
+                seconds=config_entry.options.get(OPTIONS_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
+            ),
             always_update=always_update,
         )
         self.config_entry = config_entry
+
         LOGGER.debug(
             "CarwingsDataUpdateCoordinator initialized with update interval %s",
             self.update_interval,
