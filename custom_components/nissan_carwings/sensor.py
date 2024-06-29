@@ -16,7 +16,6 @@ import pycarwings3.responses
 from custom_components.nissan_carwings.const import (
     DATA_BATTERY_STATUS_KEY,
     DATA_DRIVING_ANALYSIS_KEY,
-    DATA_TIMESTAMP_KEY,
 )
 from custom_components.nissan_carwings.coordinator import CarwingsDrivingAnalysisDataUpdateCoordinator
 
@@ -51,6 +50,8 @@ async def async_setup_entry(
 
 class BatterySensor(NissanCarwingsEntity, SensorEntity):
     """Battery Sensor."""
+
+    _attr_translation_key = "battery_soc"
 
     def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""

@@ -1,0 +1,39 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Nissan-Connect EV Zugangsdaten",
+                "data": {
+                    "username": "E-Mail-Adresse",
+                    "password": "Passwort",
+                    "region": "Region"
+                },
+                "data_description": {
+                    "pycarwings3_base_url": "Leer lassen, um den Standard-Nissan Connect API-Endpunkt zu verwenden."
+                }
+            }
+        },
+        "error": {
+            "auth": "Authentifizierung fehlgeschlagen. Bitte die Zugangsdaten prüfen.",
+            "connection": "Verbindung zum Server fehlgeschlagen.",
+            "unknown": "Unbekannter Fehler aufgetreten."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "description": "Einstellungen",
+                "data": {
+                    "update_interval": "Aktualisierungsintervall (in Sekunden)"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "battery_soc": {
+                "name": "Batterie"
+            }
+        }
+    }
+}

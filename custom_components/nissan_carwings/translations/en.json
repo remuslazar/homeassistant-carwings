@@ -2,12 +2,15 @@
     "config": {
         "step": {
             "user": {
-                "description": "Enter your Nissan Connect credentials to proceed. Leave the Base URL field empty to use the default Nissan Connect API endpoint.",
+                "description": "Enter your Nissan Connect credentials.",
                 "data": {
-                    "username": "Username",
+                    "username": "E-Mail Address",
                     "password": "Password",
                     "region": "Region",
-                    "pycarwings3_base_url": "BASE_URL"
+                    "pycarwings3_base_url": "https://domain.tld/custom/api/endpoint/"
+                },
+                "data_description": {
+                    "pycarwings3_base_url": "Leave blank to use the default Nissan Connect API endpoint."
                 }
             }
         },
@@ -20,10 +23,19 @@
     "options": {
         "step": {
             "init": {
-                "description": "Carwings Integration Settings",
+                "description": "Integration Settings",
                 "data": {
-                    "update_interval": "Update Interval (in seconds)"
+                    "update_interval": "Update (fetch) Interval (in seconds)",
+                    "poll_interval": "Default Poll Interval (in seconds)",
+                    "poll_interval_charging": "Poll Interval while charging (in seconds)"
                 }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "battery_soc": {
+                "name": "Battery"
             }
         }
     }
