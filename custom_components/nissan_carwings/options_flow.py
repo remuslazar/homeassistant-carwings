@@ -8,7 +8,14 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers import config_validation as cv
 
-from custom_components.nissan_carwings.const import DEFAULT_UPDATE_INTERVAL, OPTIONS_UPDATE_INTERVAL
+from custom_components.nissan_carwings.const import (
+    DEFAULT_POLL_INTERVAL,
+    DEFAULT_POLL_INTERVAL_CHARGING,
+    DEFAULT_UPDATE_INTERVAL,
+    OPTIONS_POLL_INTERVAL,
+    OPTIONS_POLL_INTERVAL_CHARGING,
+    OPTIONS_UPDATE_INTERVAL,
+)
 
 if TYPE_CHECKING:
     from homeassistant.data_entry_flow import FlowResult
@@ -33,6 +40,16 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Required(
                         OPTIONS_UPDATE_INTERVAL,
                         default=self.config_entry.options.get(OPTIONS_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+                    ): cv.positive_int,
+                    vol.Required(
+                        OPTIONS_POLL_INTERVAL,
+                        default=self.config_entry.options.get(OPTIONS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL),
+                    ): cv.positive_int,
+                    vol.Required(
+                        OPTIONS_POLL_INTERVAL_CHARGING,
+                        default=self.config_entry.options.get(
+                            OPTIONS_POLL_INTERVAL_CHARGING, DEFAULT_POLL_INTERVAL_CHARGING
+                        ),
                     ): cv.positive_int,
                 }
             ),
