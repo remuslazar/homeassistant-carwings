@@ -159,7 +159,7 @@ class NissanCarwingsApiClient:
             ) = await response.get_latest_battery_status()
             if battery_status:
                 LOGGER.debug(
-                    f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%"  # noqa: E501
+                    f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%, timestamp={battery_status.timestamp}"  # noqa: E501
                 )
 
         except pycarwings3.CarwingsError as exception:
