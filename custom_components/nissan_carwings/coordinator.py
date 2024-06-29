@@ -45,7 +45,7 @@ class CarwingsBaseDataUpdateCoordinator(DataUpdateCoordinator):
         self.config_entry = config_entry
 
         LOGGER.debug(
-            "CarwingsDataUpdateCoordinator initialized with update interval %s",
+            f"{self.__class__} initialized with update interval %s",
             self.update_interval,
         )
 
