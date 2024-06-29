@@ -40,9 +40,7 @@ class UpdateButton(NissanCarwingsEntity, ButtonEntity):
     ) -> None:
         """Initialize the button class."""
         super().__init__(coordinator)
-        self.entity_description = ButtonEntityDescription(
-            key="request_update", name="Request Update"
-        )
+        self.entity_description = ButtonEntityDescription(key="request_update", name="Request Update")
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
     async def async_press(self) -> None:
@@ -61,6 +59,4 @@ class UpdateButton(NissanCarwingsEntity, ButtonEntity):
     @property
     def available(self) -> bool:
         """Button availability."""
-        return (
-            not self.coordinator.config_entry.runtime_data.client.is_update_in_progress
-        )
+        return not self.coordinator.config_entry.runtime_data.client.is_update_in_progress
