@@ -48,7 +48,7 @@ class UpdateButton(NissanCarwingsEntity, ButtonEntity):
         client = self.coordinator.config_entry.runtime_data.client
         if not client.is_update_in_progress:
             client.is_update_in_progress = True
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
             await client.async_update_data()
             await self.coordinator.async_request_refresh()
         else:
