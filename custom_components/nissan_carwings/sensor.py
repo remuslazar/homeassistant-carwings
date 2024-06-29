@@ -167,7 +167,7 @@ class DrivingAnalysisEnergyMotorSensor(NissanCarwingsEntity, SensorEntity):
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
         da: pycarwings3.responses.CarwingsDrivingAnalysisResponse = self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY]
-        return float(da.power_consumption_moter)
+        return float(da.power_consumption_moter) if da is not None else None
 
 
 class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
