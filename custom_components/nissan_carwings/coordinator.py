@@ -3,17 +3,32 @@
 from __future__ import annotations
 
 from datetime import timedelta
+import datetime
 from typing import TYPE_CHECKING, Any
+from zoneinfo import ZoneInfo
 
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+import pycarwings3
+import pycarwings3.responses
+from pytz import UTC
 
 from .api import (
     NissanCarwingsApiClientAuthenticationError,
     NissanCarwingsApiClientError,
     NissanCarwingsApiUpdateTimeoutError,
 )
-from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN, LOGGER, OPTIONS_UPDATE_INTERVAL
+from .const import (
+    DATA_BATTERY_STATUS_KEY,
+    DEFAULT_POLL_INTERVAL,
+    DEFAULT_POLL_INTERVAL_CHARGING,
+    DEFAULT_UPDATE_INTERVAL,
+    DOMAIN,
+    LOGGER,
+    OPTIONS_POLL_INTERVAL,
+    OPTIONS_POLL_INTERVAL_CHARGING,
+    OPTIONS_UPDATE_INTERVAL,
+)
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -54,10 +69,41 @@ class CarwingsBaseDataUpdateCoordinator(DataUpdateCoordinator):
 class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
+    # timestamp of the last successful poll
+    battery_status_timestamp: datetime.datetime | None = None
+    is_charging: bool = False
+
     async def _async_update_data(self) -> Any:
         """Update data via library."""
         try:
-            return await self.config_entry.runtime_data.client.async_get_data()
+            # check if we need to perform a poll
+            interval = timedelta(
+                seconds=self.config_entry.options.get(OPTIONS_POLL_INTERVAL_CHARGING, DEFAULT_POLL_INTERVAL_CHARGING)
+                if self.is_charging
+                else self.config_entry.options.get(OPTIONS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)
+            )
+            if (
+                self.battery_status_timestamp is not None
+                and (datetime.datetime.now().astimezone(tz=UTC) - self.battery_status_timestamp.astimezone(tz=UTC))
+                > interval
+            ):
+                local_timestamp = self.battery_status_timestamp.astimezone(tz=ZoneInfo(self.hass.config.time_zone))
+                LOGGER.info(
+                    f"Polling for new battery_status data; old_timestamp={local_timestamp}, interval={interval} (is_charging={self.is_charging})"
+                )
+                await self.config_entry.runtime_data.client.async_update_data()
+
+            data = await self.config_entry.runtime_data.client.async_get_data()
+            battery_status: pycarwings3.responses.CarwingsLatestBatteryStatusResponse | None = data.get(
+                DATA_BATTERY_STATUS_KEY
+            )
+
+            if battery_status:
+                self.is_charging = battery_status.is_charging
+                self.battery_status_timestamp = battery_status.timestamp
+
+            return data
+
         except NissanCarwingsApiUpdateTimeoutError as exception:
             raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
