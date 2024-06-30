@@ -1,6 +1,6 @@
 {
-  "domain": "nissan_carwings",
   "name": "Nissan Connect (Carwings)",
+  "domain": "nissan_carwings",
   "codeowners": [
     "@remuslazar"
   ],
@@ -9,8 +9,8 @@
   "documentation": "https://github.com/remuslazar/homeassistant-carwings",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/remuslazar/homeassistant-carwings/issues",
-  "version": "0.0.0",
   "requirements": [
     "pycarwings3~=0.7.0"
-  ]
+  ],
+  "version": "0.1.0"
 }
