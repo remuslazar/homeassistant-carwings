@@ -68,7 +68,9 @@
             }
         },
         "button": {
-            "update": "Aktualisierung anfordern"
+            "request_update": {
+                "name": "Aktualisierung anfordern"
+            }
         }
     }
 }
