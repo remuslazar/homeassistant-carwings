@@ -9,15 +9,15 @@
 
 [![Community Forum][forum-shield]][forum]
 
-An unofficial integration for interacting with Nissan Connect vehicles using the legacy Nissan Connect EV (Carwings) API.
+## Overview
 
-**This integration will set up the following platforms.**
+This unofficial integration allows Home Assistant to interact with Nissan Connect vehicles via the legacy Nissan Connect EV (Carwings) API. It serves as an alternative to the discontinued core [nissan_leaf](https://www.home-assistant.io/integrations/nissan_leaf/) integration and draws inspiration from both the core integration and the [NissanConnect](https://github.com/dan-r/HomeAssistant-NissanConnect) integration for newer Nissan models.
 
-Platform | Description
--- | --
-`binary_sensor` | Show something `True` or `False`.
-`sensor` | Show info from blueprint API.
-`switch` | Switch something `True` or `False`.
+## Key Features
+
+- **UI Setup & Configuration**: Easily configure and manage settings directly from the Home Assistant UI.
+- **Asynchronous Networking**: Ensures non-blocking calls for a smoother experience.
+- **Quick Home Assistant Restarts**: Designed for minimal impact on Home Assistant's restart times.
 
 ## Installation
 
@@ -29,9 +29,15 @@ Platform | Description
 1. Restart Home Assistant
 1. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Nissan Carwings"
 
-## Configuration is done in the UI
+## Configuration
 
-<!---->
+Configuration is exclusively done through the Home Assistant UI using your NissanConnectEV credentials. The initial setup will verify your credentials and fetch current data, which may take a moment.
+
+## Adjustable Settings
+
+- **Update Interval**: Frequency of data updates from the API, designed to not wake the car and drain the 12V battery.
+- **Polling Interval**: Frequency of status requests to the car, which uses cellular communication and consumes a small amount of battery power from the 12V battery. Recommended setting is every 1-2 hours.
+- **Polling Interval While Charging**: Similar to the Polling Interval but for when the car is charging. The default 15-minute interval is generally suitable.
 
 ## Contributions are welcome!
 
