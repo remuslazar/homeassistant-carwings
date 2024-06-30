@@ -42,7 +42,6 @@ async def async_setup_entry(
             RemainingRangeSensor(coordinator=coordinator, is_ac_on=True),
             RemainingRangeSensor(coordinator=coordinator, is_ac_on=False),
             BatteryCapacitySensor(coordinator=coordinator),
-            DrivingAnalysisEnergyMotorSensor(coordinator=entry.runtime_data.driving_analysis_coordinator),
             DrivingAnalysisSensor(coordinator=entry.runtime_data.driving_analysis_coordinator),
         ]
     )
@@ -146,29 +145,6 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
         return float(self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh)
-
-
-class DrivingAnalysisEnergyMotorSensor(NissanCarwingsEntity, SensorEntity):
-    """Driving Analysis Energy Motor Sensor."""
-
-    def __init__(self, coordinator: CarwingsDrivingAnalysisDataUpdateCoordinator) -> None:
-        """Initialize the sensor class."""
-        super().__init__(coordinator)
-        self.entity_description = SensorEntityDescription(
-            key="driving_analysis_energy_motor",
-            name="Energy Motor",
-            device_class=SensorDeviceClass.ENERGY_STORAGE,
-            native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-            icon="mdi:engine",
-            suggested_display_precision=1,
-        )
-        self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
-
-    @property
-    def native_value(self) -> float | None:
-        """Return the native value of the sensor."""
-        da: pycarwings3.responses.CarwingsDrivingAnalysisResponse = self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY]
-        return float(da.power_consumption_moter) if da is not None else None
 
 
 class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
