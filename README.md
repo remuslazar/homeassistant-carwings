@@ -7,7 +7,6 @@
 ![Project Maintenance][maintenance-shield]
 [![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
-[![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
 An unofficial integration for interacting with Nissan Connect vehicles using the legacy Nissan Connect EV (Carwings) API.
