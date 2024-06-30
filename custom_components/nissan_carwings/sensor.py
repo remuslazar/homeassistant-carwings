@@ -162,7 +162,7 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
             key="driving_analysis",
             name="Electric Mileage",
             device_class=SensorDeviceClass.ENERGY_STORAGE,
-            native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             icon="mdi:ev-station",
             suggested_display_precision=1,
         )
