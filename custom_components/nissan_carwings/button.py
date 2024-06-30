@@ -34,6 +34,8 @@ async def async_setup_entry(
 class UpdateButton(NissanCarwingsEntity, ButtonEntity):
     """nissan_carwings switch class."""
 
+    _attr_translation_key = "request_update"
+
     def __init__(
         self,
         coordinator: CarwingsDataUpdateCoordinator,

@@ -24,15 +24,50 @@
             "init": {
                 "description": "Einstellungen",
                 "data": {
-                    "update_interval": "Aktualisierungsintervall (in Sekunden)"
+                    "update_interval": "Aktualisierungsintervall (in Sekunden)",
+                    "poll_interval": "Standard-Poll-Intervall (in Sekunden)",
+                    "poll_interval_charging": "Poll-Intervall während des Ladens (in Sekunden)"
+                },
+                "data_description": {
+                    "update_interval": "Wie oft die Integration die neuesten Daten über die API synchronisieren soll.",
+                    "poll_interval": "Wie oft die Integration die Nissan Connect API nach neuen Daten abfragen soll.",
+                    "poll_interval_charging": "Wie oft die Integration die Nissan Connect API nach neuen Daten abfragen soll, während das Fahrzeug lädt."
                 }
             }
-        }
-    },
-    "entity": {
-        "sensor": {
-            "battery_soc": {
-                "name": "Batterie"
+        },
+        "entity": {
+            "sensor": {
+                "battery_soc": {
+                    "name": "Batterie"
+                },
+                "range_ac_off": {
+                    "name": "Reichweite"
+                },
+                "range_ac_on": {
+                    "name": "Reichweite (mit Klima)"
+                },
+                "battery_capacity": {
+                    "name": "Batteriekapazität"
+                },
+                "electric_mileage": {
+                    "name": "Tagesverbrauch"
+                }
+            },
+            "switch": {
+                "ac_control": {
+                    "name": "Klima"
+                }
+            },
+            "binary_sensor": {
+                "plug_status": {
+                    "name": "Kabel"
+                },
+                "charging_status": {
+                    "name": "Status"
+                }
+            },
+            "button": {
+                "update": "Aktualisierung anfordern"
             }
         }
     }

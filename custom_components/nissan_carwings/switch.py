@@ -35,6 +35,8 @@ async def async_setup_entry(
 class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     """nissan_carwings switch class."""
 
+    _attr_translation_key = "ac_control"
+
     def __init__(
         self,
         coordinator: CarwingsClimateDataUpdateCoordinator,

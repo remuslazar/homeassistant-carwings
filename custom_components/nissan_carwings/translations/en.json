@@ -28,14 +28,49 @@
                     "update_interval": "Update (fetch) Interval (in seconds)",
                     "poll_interval": "Default Poll Interval (in seconds)",
                     "poll_interval_charging": "Poll Interval while charging (in seconds)"
+                },
+                "data_description": {
+                    "update_interval": "How often the integration should synchronize latest data from via API.",
+                    "poll_interval": "How often the integration should poll the Nissan Connect API for new data.",
+                    "poll_interval_charging": "How often the integration should poll the Nissan Connect API for new data while charging."
                 }
             }
-        }
-    },
-    "entity": {
-        "sensor": {
-            "battery_soc": {
-                "name": "Battery"
+        },
+        "entity": {
+            "sensor": {
+                "battery_soc": {
+                    "name": "Battery"
+                },
+                "range_ac_off": {
+                    "name": "Estimated Range"
+                },
+                "range_ac_on": {
+                    "name": "Estimated Range (AC)"
+                },
+                "battery_capacity": {
+                    "name": "Battery Capacity"
+                },
+                "electric_mileage": {
+                    "name": "Daily Efficiency"
+                }
+            },
+            "switch": {
+                "ac_control": {
+                    "name": "Climate Control"
+                }
+            },
+            "binary_sensor": {
+                "plug_status": {
+                    "name": "Plug Status"
+                },
+                "charging_status": {
+                    "name": "Charging"
+                }
+            },
+            "button": {
+                "request_update": {
+                    "name": "Request Update"
+                }
             }
         }
     }

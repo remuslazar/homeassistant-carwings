@@ -93,6 +93,7 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
             device_class=SensorDeviceClass.DISTANCE,
             native_unit_of_measurement=PERCENTAGE,
         )
+        self._attr_translation_key = "range_ac_on" if is_ac_on else "range_ac_off"
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
         self._attr_icon = "mdi:speedometer"
 
@@ -124,6 +125,8 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
 class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
     """Current Battery Capacity Sensor."""
 
+    _attr_translation_key = "battery_capacity"
+
     def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
@@ -150,15 +153,17 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
 class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
     """Driving Analysis Sensor."""
 
+    _attr_translation_key = "electric_mileage"
+
     def __init__(self, coordinator: CarwingsDrivingAnalysisDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
         self.entity_description = SensorEntityDescription(
             key="driving_analysis",
-            name="Driving Mileage",
+            name="Electric Mileage",
             device_class=SensorDeviceClass.ENERGY_STORAGE,
             native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-            icon="mdi:car",
+            icon="mdi:ev-station",
             suggested_display_precision=1,
         )
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"

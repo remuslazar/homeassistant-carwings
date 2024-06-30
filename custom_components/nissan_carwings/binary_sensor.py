@@ -39,6 +39,8 @@ async def async_setup_entry(
 class LeafPluggedInSensor(NissanCarwingsEntity, BinarySensorEntity):
     """Plugged In Sensor class."""
 
+    _attr_translation_key = "plug_status"
+
     def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
@@ -63,12 +65,14 @@ class LeafPluggedInSensor(NissanCarwingsEntity, BinarySensorEntity):
 class LeafChargingSensor(NissanCarwingsEntity, BinarySensorEntity):
     """Charging Sensor class."""
 
+    _attr_translation_key = "charging_status"
+
     def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
         super().__init__(coordinator)
         self.entity_description = BinarySensorEntityDescription(
             key="charging_status",
-            name="Charging",
+            name="Charging Status",
             device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
         )
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
