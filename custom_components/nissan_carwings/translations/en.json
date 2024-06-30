@@ -35,42 +35,42 @@
                     "poll_interval_charging": "How often the integration should poll the Nissan Connect API for new data while charging."
                 }
             }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "battery_soc": {
+                "name": "Battery"
+            },
+            "range_ac_off": {
+                "name": "Estimated Range"
+            },
+            "range_ac_on": {
+                "name": "Estimated Range (AC)"
+            },
+            "battery_capacity": {
+                "name": "Battery Capacity"
+            },
+            "electric_mileage": {
+                "name": "Daily Efficiency"
+            }
         },
-        "entity": {
-            "sensor": {
-                "battery_soc": {
-                    "name": "Battery"
-                },
-                "range_ac_off": {
-                    "name": "Estimated Range"
-                },
-                "range_ac_on": {
-                    "name": "Estimated Range (AC)"
-                },
-                "battery_capacity": {
-                    "name": "Battery Capacity"
-                },
-                "electric_mileage": {
-                    "name": "Daily Efficiency"
-                }
+        "switch": {
+            "ac_control": {
+                "name": "Climate Control"
+            }
+        },
+        "binary_sensor": {
+            "plug_status": {
+                "name": "Plug Status"
             },
-            "switch": {
-                "ac_control": {
-                    "name": "Climate Control"
-                }
-            },
-            "binary_sensor": {
-                "plug_status": {
-                    "name": "Plug Status"
-                },
-                "charging_status": {
-                    "name": "Charging"
-                }
-            },
-            "button": {
-                "request_update": {
-                    "name": "Request Update"
-                }
+            "charging_status": {
+                "name": "Charging"
+            }
+        },
+        "button": {
+            "request_update": {
+                "name": "Request Update"
             }
         }
     }
