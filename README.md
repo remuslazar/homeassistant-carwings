@@ -45,7 +45,6 @@ If you want to contribute to this please read the [Contribution guidelines](CONT
 [buymecoffeebadge]: https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=for-the-badge
 [commits-shield]: https://img.shields.io/github/commit-activity/y/remuslazar/homeassistant-carwings.svg?style=for-the-badge
 [commits]: https://github.com/remuslazar/homeassistant-carwings/commits/main
-[discord]: https://discord.gg/Qa5fW2R
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
 [forum]: https://community.home-assistant.io/
 [license-shield]: https://img.shields.io/github/license/remuslazar/homeassistant-carwings.svg?style=for-the-badge
