@@ -1,6 +1,6 @@
 {
-  "name": "Nissan Connect (Carwings)",
   "domain": "nissan_carwings",
+  "name": "Nissan Connect (Carwings)",
   "codeowners": [
     "@remuslazar"
   ],
