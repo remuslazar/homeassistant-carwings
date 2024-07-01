@@ -57,7 +57,8 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
         data: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
             DATA_CLIMATE_STATUS_KEY
         ]
-        return data.is_hvac_running
+        # assume the AC is not running when the data is not available
+        return data.is_hvac_running if data else False
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""

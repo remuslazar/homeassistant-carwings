@@ -100,11 +100,12 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Battery range in miles or kms."""
+        data: pycarwings3.responses.CarwingsLatestBatteryStatusResponse = self.coordinator.data[DATA_BATTERY_STATUS_KEY]
         ret: float | None
         if self._ac_on:
-            ret = self.coordinator.data[DATA_BATTERY_STATUS_KEY].cruising_range_ac_on_km
+            ret = data.cruising_range_ac_on_km
         else:
-            ret = self.coordinator.data[DATA_BATTERY_STATUS_KEY].cruising_range_ac_off_km
+            ret = data.cruising_range_ac_off_km
 
         if ret is None:
             return None
@@ -120,6 +121,13 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
         if self.hass.config.units is US_CUSTOMARY_SYSTEM:
             return UnitOfLength.MILES
         return UnitOfLength.KILOMETERS
+
+    @property
+    def available(self) -> bool:
+        """Sensor availability."""
+        data: pycarwings3.responses.CarwingsLatestBatteryStatusResponse = self.coordinator.data[DATA_BATTERY_STATUS_KEY]
+        attr = "cruising_range_ac_on_km" if self._ac_on else "cruising_range_ac_off_km"
+        return hasattr(data, attr)
 
 
 class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
