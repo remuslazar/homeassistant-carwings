@@ -183,6 +183,11 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
         return float(da.electric_mileage)
 
     @property
+    def available(self) -> bool:
+        """Sensor availability."""
+        return self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY] is not None
+
+    @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return default attributes for Nissan leaf entities."""
 
