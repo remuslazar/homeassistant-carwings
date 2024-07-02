@@ -13,7 +13,12 @@ from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME, Platf
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
-from custom_components.nissan_carwings.const import CONF_PYCARWINGS3_BASE_URL
+from custom_components.nissan_carwings.const import (
+    CONF_PYCARWINGS3_BASE_URL,
+    DATA_CLIMATE_STATUS_KEY,
+    DATA_DRIVING_ANALYSIS_KEY,
+    DATA_TIMESTAMP_KEY,
+)
 
 from .api import NissanCarwingsApiClient
 from .coordinator import (
@@ -71,8 +76,11 @@ async def async_setup_entry(
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
     await coordinator.async_config_entry_first_refresh()
 
-    await climate_coordinator.async_refresh()
-    await driving_analysis_coordinator.async_refresh()
+    climate_coordinator.data = {DATA_CLIMATE_STATUS_KEY: None, DATA_TIMESTAMP_KEY: None}
+    driving_analysis_coordinator.data = {DATA_DRIVING_ANALYSIS_KEY: None, DATA_TIMESTAMP_KEY: None}
+
+    hass.loop.create_task(climate_coordinator.async_refresh())
+    hass.loop.create_task(driving_analysis_coordinator.async_refresh())
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
