@@ -174,8 +174,9 @@ class NissanCarwingsApiClient:
                     f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%, timestamp={battery_status.timestamp}"  # noqa: E501
                 )
 
-        except pycarwings3.CarwingsError as exception:
-            msg = f"Error fetching data - {exception}"
+        except Exception as exception:
+            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            LOGGER.error(msg)
             raise NissanCarwingsApiClientError(
                 msg,
             ) from exception
@@ -198,8 +199,9 @@ class NissanCarwingsApiClient:
                     f"carwings3.get_latest_hvac_status() OK: running={climate_status.is_hvac_running}"  # noqa: E501
                 )
 
-        except pycarwings3.CarwingsError as exception:
-            msg = f"Error fetching data - {exception}"
+        except Exception as exception:
+            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            LOGGER.error(msg)
             raise NissanCarwingsApiClientError(
                 msg,
             ) from exception
@@ -213,34 +215,41 @@ class NissanCarwingsApiClient:
         """Set climate control."""
         self.climate_control_pending_state = switch_on
 
-        response = await self._carwings3.get_leaf()
-        LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
+        try:
+            response = await self._carwings3.get_leaf()
+            LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
 
-        result_key = await response.start_climate_control() if switch_on else await response.stop_climate_control()
-        LOGGER.debug("carwings3.start/stop_climate_control() OK: resultKey=%s", result_key)
-        for attempt in range(PYCARWINGS_MAX_RESPONSE_ATTEMPTS):
-            status = (
-                await response.get_start_climate_control_result(result_key)
-                if switch_on
-                else await response.get_stop_climate_control_result(result_key)
-            )
-            LOGGER.debug(
-                "Waiting %s seconds for climate status update (%s) (%s)",
-                PYCARWINGS_SLEEP,
-                response.vin,
-                attempt,
-            )
-            await asyncio.sleep(PYCARWINGS_SLEEP)
-
-            if status is not None:
-                LOGGER.debug(
-                    "carwings3.get_climate_status_from_update() OK: timestamp=%s",
-                    status.timestamp,
+            result_key = await response.start_climate_control() if switch_on else await response.stop_climate_control()
+            LOGGER.debug("carwings3.start/stop_climate_control() OK: resultKey=%s", result_key)
+            for attempt in range(PYCARWINGS_MAX_RESPONSE_ATTEMPTS):
+                status = (
+                    await response.get_start_climate_control_result(result_key)
+                    if switch_on
+                    else await response.get_stop_climate_control_result(result_key)
                 )
-                break
-        else:
-            LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
-            raise NissanCarwingsApiUpdateTimeoutError
+                LOGGER.debug(
+                    "Waiting %s seconds for climate status update (%s) (%s)",
+                    PYCARWINGS_SLEEP,
+                    response.vin,
+                    attempt,
+                )
+                await asyncio.sleep(PYCARWINGS_SLEEP)
+
+                if status is not None:
+                    LOGGER.debug(
+                        "carwings3.get_climate_status_from_update() OK: timestamp=%s",
+                        status.timestamp,
+                    )
+                    break
+            else:
+                LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
+                raise NissanCarwingsApiUpdateTimeoutError
+        except Exception as exception:
+            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            LOGGER.error(msg)
+            raise NissanCarwingsApiClientError(
+                msg,
+            ) from exception
 
         self.climate_control_pending_state = None
 
@@ -257,8 +266,9 @@ class NissanCarwingsApiClient:
                     f"carwings3.get_drive_analysis() OK; target_date={driving_analysis.target_date}, mileage={driving_analysis.electric_mileage}"
                 )
 
-        except pycarwings3.CarwingsError as exception:
-            msg = f"Error fetching data - {exception}"
+        except Exception as exception:
+            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            LOGGER.error(msg)
             raise NissanCarwingsApiClientError(
                 msg,
             ) from exception
