@@ -79,6 +79,8 @@ async def async_setup_entry(
     climate_coordinator.data = {DATA_CLIMATE_STATUS_KEY: None, DATA_TIMESTAMP_KEY: None}
     driving_analysis_coordinator.data = {DATA_DRIVING_ANALYSIS_KEY: None, DATA_TIMESTAMP_KEY: None}
 
+    # synchronize data in background to speedup the startup time for this integration
+    # related entities will stick in the unavailable state until the first data is fetched
     hass.loop.create_task(climate_coordinator.async_refresh())
     hass.loop.create_task(driving_analysis_coordinator.async_refresh())
 
