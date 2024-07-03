@@ -11,6 +11,7 @@
   "requirements": [
     "pycarwings3~=0.7.0"
   ],
+  "integration_type": "service",
   "single_config_entry": true,
   "version": "0.1.0"
 }
