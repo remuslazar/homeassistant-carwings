@@ -11,7 +11,6 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import pycarwings3
 import pycarwings3.responses
-from pytz import UTC
 
 from .api import (
     NissanCarwingsApiClientAuthenticationError,
@@ -84,8 +83,7 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             )
             if (
                 self.battery_status_timestamp is not None
-                and (datetime.datetime.now().astimezone(tz=UTC) - self.battery_status_timestamp.astimezone(tz=UTC))
-                > interval
+                and (datetime.datetime.now(datetime.UTC) - self.battery_status_timestamp) > interval
             ):
                 local_timestamp = self.battery_status_timestamp.astimezone(tz=ZoneInfo(self.hass.config.time_zone))
                 LOGGER.info(
