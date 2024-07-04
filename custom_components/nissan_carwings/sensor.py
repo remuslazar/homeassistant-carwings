@@ -77,7 +77,7 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent is not None
+        return self.coordinator.data[DATA_BATTERY_STATUS_KEY] is not None
 
 
 class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
@@ -150,7 +150,7 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def available(self) -> bool:
         """Sensor availability."""
-        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh is not None
+        return self.coordinator.data[DATA_BATTERY_STATUS_KEY] is not None
 
     @property
     def native_value(self) -> float | None:
