@@ -103,6 +103,8 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             return data
 
         except NissanCarwingsApiUpdateTimeoutError as exception:
+            # in this case we want to retry the update right away but wait for the next scheduled update
+            self.battery_status_timestamp = None
             raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception

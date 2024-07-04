@@ -154,8 +154,13 @@ class NissanCarwingsApiClient:
                         status.timestamp,
                     )
                     break
+                else:
+                    LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
+                    raise NissanCarwingsApiClientError
             else:
-                LOGGER.error("carwings3.get_status_from_update() failed: vin=%s", response.vin)
+                LOGGER.error(
+                    f"carwings3.request_update() => Timeout after {PYCARWINGS_MAX_RESPONSE_ATTEMPTS} attempts x {PYCARWINGS_SLEEP}s; vin={response.vin}"
+                )
                 raise NissanCarwingsApiUpdateTimeoutError
 
             # finally
