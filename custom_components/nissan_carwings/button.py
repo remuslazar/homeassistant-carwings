@@ -51,7 +51,10 @@ class UpdateButton(NissanCarwingsEntity, ButtonEntity):
         if not client.is_update_in_progress:
             client.is_update_in_progress = True
             self.async_write_ha_state()
-            await client.async_update_data()
+            try:
+                await client.async_update_data()
+            except Exception as exception:
+                LOGGER.error("Error performing update via update button: %s", exception)
             await self.coordinator.async_request_refresh()
         else:
             LOGGER.warning(
