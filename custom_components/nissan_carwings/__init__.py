@@ -18,6 +18,7 @@ from custom_components.nissan_carwings.const import (
     DATA_CLIMATE_STATUS_KEY,
     DATA_DRIVING_ANALYSIS_KEY,
     DATA_TIMESTAMP_KEY,
+    LOGGER,
 )
 
 from .api import NissanCarwingsApiClient
@@ -72,6 +73,8 @@ async def async_setup_entry(
         climate_coordinator=climate_coordinator,
         driving_analysis_coordinator=driving_analysis_coordinator,
     )
+
+    LOGGER.info(f"Starting Nissan Carwings integration for user={entry.data[CONF_USERNAME]}")
 
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
     await coordinator.async_config_entry_first_refresh()
