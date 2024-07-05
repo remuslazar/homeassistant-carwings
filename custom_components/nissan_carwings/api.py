@@ -161,6 +161,8 @@ class NissanCarwingsApiClient:
                         f"carwings3.request_update() => Timeout after {PYCARWINGS_MAX_RESPONSE_ATTEMPTS} attempts x {PYCARWINGS_SLEEP}s; vin={response.vin}"
                     )
                     raise NissanCarwingsApiUpdateTimeoutError
+            except NissanCarwingsApiUpdateTimeoutError:
+                raise
             except Exception as exception:
                 raise NissanCarwingsApiClientError from exception
 
