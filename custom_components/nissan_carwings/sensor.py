@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
@@ -15,9 +16,13 @@ import pycarwings3.responses
 
 from custom_components.nissan_carwings.const import (
     DATA_BATTERY_STATUS_KEY,
+    DATA_CLIMATE_STATUS_KEY,
     DATA_DRIVING_ANALYSIS_KEY,
 )
-from custom_components.nissan_carwings.coordinator import CarwingsDrivingAnalysisDataUpdateCoordinator
+from custom_components.nissan_carwings.coordinator import (
+    CarwingsClimateDataUpdateCoordinator,
+    CarwingsDrivingAnalysisDataUpdateCoordinator,
+)
 
 from .entity import NissanCarwingsEntity
 
@@ -43,6 +48,7 @@ async def async_setup_entry(
             RemainingRangeSensor(coordinator=coordinator, is_ac_on=False),
             BatteryCapacitySensor(coordinator=coordinator),
             DrivingAnalysisSensor(coordinator=entry.runtime_data.driving_analysis_coordinator),
+            HVACTimerSensor(coordinator=entry.runtime_data.climate_coordinator),
         ]
     )
 
@@ -205,3 +211,46 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
             "VIN": self.coordinator.config_entry.data["vin"],
             **driving_analysis,
         }
+
+
+class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
+    """Remaining HVAC Duration Sensor."""
+
+    _attr_translation_key = "hvac_timer"
+
+    def __init__(self, coordinator: CarwingsClimateDataUpdateCoordinator) -> None:
+        """Initialize the sensor class."""
+        super().__init__(coordinator)
+        self.entity_description = SensorEntityDescription(
+            key="hvac_timer",
+            name="AC Timer",
+            device_class=SensorDeviceClass.TIMESTAMP,
+            icon="mdi:timer-outline",
+        )
+        self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
+
+    @property
+    def available(self) -> bool:
+        """Sensor availability."""
+        if super().available is False:
+            return False
+        if DATA_CLIMATE_STATUS_KEY not in self.coordinator.data:
+            return False
+
+        climate: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
+            DATA_CLIMATE_STATUS_KEY
+        ]
+
+        return climate.is_hvac_running and climate.ac_duration is not None
+
+    @property
+    def native_value(self) -> datetime | None:
+        """Return the native value of the sensor."""
+        if DATA_CLIMATE_STATUS_KEY not in self.coordinator.data:
+            return None
+        climate: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
+            DATA_CLIMATE_STATUS_KEY
+        ]
+        if climate.ac_start_stop_date_and_time is None or climate.ac_duration is None:
+            return None
+        return climate.ac_start_stop_date_and_time + climate.ac_duration
