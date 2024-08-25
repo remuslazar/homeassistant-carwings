@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+from pytz import UTC
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
@@ -50,21 +52,34 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     def is_on(self) -> bool:
         """Return true if the switch is on."""
         client = self.coordinator.config_entry.runtime_data.client
-        # respect the pending state
-        if client.climate_control_pending_state is not None:
-            return client.climate_control_pending_state
 
         data: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
             DATA_CLIMATE_STATUS_KEY
         ]
-        # assume the AC is not running when the data is not available
-        return data.is_hvac_running if data else False
+
+        # respect the pending state if it was requested after the last update
+        if (
+            client.climate_control_pending_state is not None
+            and client.climate_control_pending_timestamp is not None
+            and data.ac_start_stop_date_and_time is not None
+            and client.climate_control_pending_timestamp > data.ac_start_stop_date_and_time
+        ):
+            is_hvac_running = client.climate_control_pending_state
+        else:
+            is_hvac_running = data.is_hvac_running
+
+        # check if the maximum running time has been reached or exceeded
+        if is_hvac_running and data.ac_start_stop_date_and_time is not None and data.ac_duration is not None:
+            if datetime.now().astimezone(tz=UTC) > data.ac_start_stop_date_and_time + data.ac_duration:
+                is_hvac_running = False
+
+        return is_hvac_running
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""
         client = self.coordinator.config_entry.runtime_data.client
         client.climate_control_pending_state = True
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
         await client.async_set_climate(switch_on=True)
         await self.coordinator.async_request_refresh()
 
@@ -72,14 +87,6 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
         """Turn off the switch."""
         client = self.coordinator.config_entry.runtime_data.client
         client.climate_control_pending_state = False
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
         await client.async_set_climate(switch_on=False)
         await self.coordinator.async_request_refresh()
-
-    @property
-    def available(self) -> bool:
-        """Switch availability."""
-        if super().available is False:
-            return False
-
-        return self.coordinator.config_entry.runtime_data.client.climate_control_pending_state is None
