@@ -83,6 +83,7 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             )
             if (
                 self.battery_status_timestamp is not None
+                and interval.seconds > 0
                 and (datetime.datetime.now(datetime.UTC) - self.battery_status_timestamp) > interval
             ):
                 local_timestamp = self.battery_status_timestamp.astimezone(tz=ZoneInfo(self.hass.config.time_zone))
