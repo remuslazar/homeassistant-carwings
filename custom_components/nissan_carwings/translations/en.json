@@ -53,6 +53,9 @@
             },
             "electric_mileage": {
                 "name": "Daily Efficiency"
+            },
+            "hvac_timer": {
+                "name": "AC Timer"
             }
         },
         "switch": {

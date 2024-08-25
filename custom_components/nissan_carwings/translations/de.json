@@ -52,6 +52,9 @@
             },
             "electric_mileage": {
                 "name": "Tagesverbrauch"
+            },
+            "hvac_timer": {
+                "name": "Klima-Timer"
             }
         },
         "switch": {
