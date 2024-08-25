@@ -13,5 +13,5 @@
     "pycarwings3~=0.7.4"
   ],
   "single_config_entry": true,
-  "version": "0.1.4"
+  "version": "0.1.5"
 }
