@@ -61,12 +61,14 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
         if (
             client.climate_control_pending_state is not None
             and client.climate_control_pending_timestamp is not None
-            and data.ac_start_stop_date_and_time is not None
-            and client.climate_control_pending_timestamp > data.ac_start_stop_date_and_time
+            and (
+                data.ac_start_stop_date_and_time is None
+                or client.climate_control_pending_timestamp > data.ac_start_stop_date_and_time
+            )
         ):
             is_hvac_running = client.climate_control_pending_state
         else:
-            is_hvac_running = data.is_hvac_running
+            is_hvac_running = data.is_hvac_running if data is not None else False
 
         # check if the maximum running time has been reached or exceeded
         if is_hvac_running and data.ac_start_stop_date_and_time is not None and data.ac_duration is not None:
@@ -78,15 +80,13 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""
         client = self.coordinator.config_entry.runtime_data.client
-        client.climate_control_pending_state = True
-        self.async_write_ha_state()
         await client.async_set_climate(switch_on=True)
+        self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **_: Any) -> None:
         """Turn off the switch."""
         client = self.coordinator.config_entry.runtime_data.client
-        client.climate_control_pending_state = False
-        self.async_write_ha_state()
         await client.async_set_climate(switch_on=False)
+        self.async_write_ha_state()
         await self.coordinator.async_request_refresh()

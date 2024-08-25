@@ -241,7 +241,7 @@ class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
             DATA_CLIMATE_STATUS_KEY
         ]
 
-        return climate.is_hvac_running and climate.ac_duration is not None
+        return climate is not None and climate.is_hvac_running and climate.ac_duration is not None
 
     @property
     def native_value(self) -> datetime | None:
