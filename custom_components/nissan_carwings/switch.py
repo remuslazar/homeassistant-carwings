@@ -66,7 +66,7 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
         ):
             is_hvac_running = client.climate_control_pending_state
         else:
-            is_hvac_running = data.is_hvac_running
+            is_hvac_running = data.is_hvac_running if data is not None else False
 
         # check if the maximum running time has been reached or exceeded
         if is_hvac_running and data.ac_start_stop_date_and_time is not None and data.ac_duration is not None:
