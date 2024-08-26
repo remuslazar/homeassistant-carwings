@@ -188,7 +188,7 @@ class NissanCarwingsApiClient:
                 )
 
         except Exception as exception:
-            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            msg = f"Error fetching battery status - {exception.__class__.__name__}: {exception}"
             LOGGER.error(msg)
             raise NissanCarwingsApiClientError(
                 msg,
@@ -213,7 +213,7 @@ class NissanCarwingsApiClient:
                 )
 
         except Exception as exception:
-            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            msg = f"Error fetching climate data - {exception.__class__.__name__}: {exception}"
             LOGGER.error(msg)
             raise NissanCarwingsApiClientError(
                 msg,
@@ -256,7 +256,7 @@ class NissanCarwingsApiClient:
                 )
 
         except Exception as exception:
-            msg = f"Error fetching data - {exception.__class__.__name__}: {exception}"
+            msg = f"Error fetching driving analysis data - {exception.__class__.__name__}: {exception}"
             LOGGER.error(msg)
             raise NissanCarwingsApiClientError(
                 msg,
