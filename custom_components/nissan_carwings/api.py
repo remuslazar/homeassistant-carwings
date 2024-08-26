@@ -62,6 +62,9 @@ class NissanCarwingsApiClient:
     # False if it should be turned off
     climate_control_pending_state = None
 
+    # timestamp when the climate control change was requested
+    climate_control_pending_timestamp = None
+
     is_update_in_progress = False
     update_semaphore = asyncio.Semaphore(1)
 
@@ -78,8 +81,6 @@ class NissanCarwingsApiClient:
         self._password = password
         self._region = region
         self._session = session
-        self.climate_control_pending_timestamp = None
-        self.climate_control_pending_state = None
 
         if base_url:
             # use the custom base_url the user has provided via
