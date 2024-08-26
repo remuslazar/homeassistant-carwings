@@ -209,7 +209,7 @@ class NissanCarwingsApiClient:
             ) = await response.get_latest_hvac_status()
             if climate_status:
                 LOGGER.debug(
-                    f"carwings3.get_latest_hvac_status() OK: running={climate_status.is_hvac_running}, remaining_time={climate_status.ac_duration}, start/stop timestamp: {climate_status._operation_date_and_time}"  # noqa: E501
+                    f"carwings3.get_latest_hvac_status() OK: running={climate_status.is_hvac_running}, remaining_time={climate_status.ac_duration}, start/stop timestamp: {climate_status.ac_start_stop_date_and_time}"  # noqa: E501
                 )
 
         except Exception as exception:
