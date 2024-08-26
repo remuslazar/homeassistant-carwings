@@ -1,0 +1,7 @@
+update:
+  fields:
+    vin:
+      required: true
+      example: WBANXXXXXX1234567
+      selector:
+        text:
