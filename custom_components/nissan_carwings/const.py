@@ -16,6 +16,8 @@ OPTIONS_UPDATE_INTERVAL = "update_interval"
 OPTIONS_POLL_INTERVAL = "poll_interval"
 OPTIONS_POLL_INTERVAL_CHARGING = "poll_interval_charging"
 DEFAULT_UPDATE_INTERVAL = 300
+# we will use this update interval while awaiting an update from the car, currently only used for climate control
+UPDATE_INTERVAL_WHILE_AWAITING_UPDATE = 60
 DEFAULT_POLL_INTERVAL = 7200
 DEFAULT_POLL_INTERVAL_CHARGING = 900
 

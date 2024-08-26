@@ -19,6 +19,7 @@ from .api import (
 )
 from .const import (
     DATA_BATTERY_STATUS_KEY,
+    DATA_CLIMATE_STATUS_KEY,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL_CHARGING,
     DEFAULT_UPDATE_INTERVAL,
@@ -27,6 +28,7 @@ from .const import (
     OPTIONS_POLL_INTERVAL,
     OPTIONS_POLL_INTERVAL_CHARGING,
     OPTIONS_UPDATE_INTERVAL,
+    UPDATE_INTERVAL_WHILE_AWAITING_UPDATE,
 )
 
 if TYPE_CHECKING:
@@ -119,7 +121,26 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
     async def _async_update_data(self) -> Any:
         """Update data via library."""
         try:
-            return await self.config_entry.runtime_data.client.async_get_climate_data()
+            client = self.config_entry.runtime_data.client
+            data = await client.async_get_climate_data()
+            climate_data: pycarwings3.pycarwings3.CarwingsLatestClimateControlStatusResponse = data.get(
+                DATA_CLIMATE_STATUS_KEY
+            )
+            if client.climate_control_pending_timestamp is not None:
+                # check if the pending state is still in effect
+                if (
+                    climate_data.ac_start_stop_date_and_time is None
+                    or client.climate_control_pending_timestamp > climate_data.ac_start_stop_date_and_time
+                ):
+                    # pending state is still in effect, we will poll more frequently
+                    self.update_interval = timedelta(seconds=UPDATE_INTERVAL_WHILE_AWAITING_UPDATE)
+                else:
+                    # pending state is no longer in effect, we will return to the normal update interval
+                    self.update_interval = timedelta(
+                        seconds=self.config_entry.options.get(OPTIONS_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
+                    )
+
+            return data
         except NissanCarwingsApiUpdateTimeoutError as exception:
             raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
