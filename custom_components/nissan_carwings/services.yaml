@@ -1,6 +1,8 @@
 update:
   fields:
     vin:
+      name: VIN
+      description: The VIN of the vehicle
       required: true
       example: WBANXXXXXX1234567
       selector:
