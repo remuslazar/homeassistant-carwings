@@ -74,6 +74,9 @@
         "button": {
             "request_update": {
                 "name": "Request Update"
+            },
+            "start_charging": {
+                "name": "Start Charging"
             }
         }
     }

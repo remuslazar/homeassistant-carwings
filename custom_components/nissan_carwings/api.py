@@ -266,3 +266,10 @@ class NissanCarwingsApiClient:
                 DATA_DRIVING_ANALYSIS_KEY: driving_analysis,
                 DATA_TIMESTAMP_KEY: None,  # unfortunately there is no timestamp info in the response
             }
+
+    async def async_start_charging(self) -> bool:
+        """Start charging."""
+        response = await self._carwings3.get_leaf()
+        result = await response.start_charging()
+        LOGGER.debug("carwings3.start_charging(): result=%s", result)
+        return result

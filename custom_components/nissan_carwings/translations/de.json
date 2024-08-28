@@ -73,6 +73,9 @@
         "button": {
             "request_update": {
                 "name": "Aktualisierung anfordern"
+            },
+            "start_charging": {
+                "name": "Laden starten"
             }
         }
     }
