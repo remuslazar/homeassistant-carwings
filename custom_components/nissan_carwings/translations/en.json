@@ -83,6 +83,7 @@
             "description": "Update the battery status and range of the vehicle asynchronously.",
             "fields": {
                 "vin": {
+                    "name": "VIN",
                     "description": "VIN of the vehicle",
                     "example": "JN1AZ4CP9BT007988"
                 }
