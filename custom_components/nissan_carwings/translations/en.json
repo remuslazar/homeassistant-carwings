@@ -76,5 +76,17 @@
                 "name": "Request Update"
             }
         }
+    },
+    "services": {
+        "update": {
+            "name": "Request Update",
+            "description": "Update the battery status and range of the vehicle asynchronously.",
+            "fields": {
+                "vin": {
+                    "description": "VIN of the vehicle",
+                    "example": "JN1AZ4CP9BT007988"
+                }
+            }
+        }
     }
 }

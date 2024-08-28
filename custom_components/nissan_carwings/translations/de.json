@@ -75,5 +75,17 @@
                 "name": "Aktualisierung anfordern"
             }
         }
+    },
+    "services": {
+        "update": {
+            "name": "Aktualisierung anfordern",
+            "description": "Aktualisiert die Daten des Fahrzeugs asynchron.",
+            "fields": {
+                "vin": {
+                    "description": "Fahrzeug VIN (Identifikationsnummer)",
+                    "example": "JN1FAAZE0U0000000"
+                }
+            }
+        }
     }
 }
