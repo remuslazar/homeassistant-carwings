@@ -217,6 +217,7 @@ class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
     """Remaining HVAC Duration Sensor."""
 
     _attr_translation_key = "hvac_timer"
+    coordinator: CarwingsClimateDataUpdateCoordinator
 
     def __init__(self, coordinator: CarwingsClimateDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
@@ -241,7 +242,12 @@ class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
             DATA_CLIMATE_STATUS_KEY
         ]
 
-        return climate is not None and climate.is_hvac_running and climate.ac_duration is not None
+        return (
+            climate is not None
+            and self.coordinator.is_hvac_running
+            and not self.coordinator.is_climate_pending_state_active
+            and climate.ac_duration is not None
+        )
 
     @property
     def native_value(self) -> datetime | None:
