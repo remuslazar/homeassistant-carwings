@@ -1,19 +1,11 @@
 """Switch platform for nissan_carwings."""
 
 from __future__ import annotations
-
-from datetime import datetime
-from pytz import UTC
 from typing import TYPE_CHECKING, Any
-
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
-
-from custom_components.nissan_carwings.const import DATA_CLIMATE_STATUS_KEY
-
 from .entity import NissanCarwingsEntity
 
 if TYPE_CHECKING:
-    import pycarwings3.responses
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
