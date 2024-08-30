@@ -18,6 +18,7 @@ from custom_components.nissan_carwings.const import (
     DATA_BATTERY_STATUS_KEY,
     DATA_CLIMATE_STATUS_KEY,
     DATA_DRIVING_ANALYSIS_KEY,
+    DATA_TIMESTAMP_KEY,
 )
 from custom_components.nissan_carwings.coordinator import (
     CarwingsClimateDataUpdateCoordinator,
@@ -48,6 +49,7 @@ async def async_setup_entry(
             RemainingRangeSensor(coordinator=coordinator, is_ac_on=False),
             BatteryCapacitySensor(coordinator=coordinator),
             DrivingAnalysisSensor(coordinator=entry.runtime_data.driving_analysis_coordinator),
+            LastBatteryStatusUpdateSensor(coordinator=coordinator),
             HVACTimerSensor(coordinator=entry.runtime_data.climate_coordinator),
         ]
     )
@@ -213,10 +215,37 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
         }
 
 
+class LastBatteryStatusUpdateSensor(NissanCarwingsEntity, SensorEntity):
+    """Last Successful Battery Status Update Sensor."""
+
+    _attr_translation_key = "last_battery_status_update"
+    _attr_icon = "mdi:clock-outline"
+
+    def __init__(self, coordinator: CarwingsDataUpdateCoordinator) -> None:
+        """Initialize the sensor class."""
+        super().__init__(coordinator)
+        self.entity_description = SensorEntityDescription(
+            key="last_update",
+            name="Last Update",
+            device_class=SensorDeviceClass.TIMESTAMP,
+            icon="mdi:update",
+        )
+        self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
+
+    @property
+    def native_value(self) -> datetime | None:
+        """Return the native value of the sensor."""
+        if self.coordinator.data is None:
+            return None
+
+        return self.coordinator.data.get(DATA_TIMESTAMP_KEY)
+
+
 class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
     """Remaining HVAC Duration Sensor."""
 
     _attr_translation_key = "hvac_timer"
+    coordinator: CarwingsClimateDataUpdateCoordinator
 
     def __init__(self, coordinator: CarwingsClimateDataUpdateCoordinator) -> None:
         """Initialize the sensor class."""
@@ -241,7 +270,12 @@ class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
             DATA_CLIMATE_STATUS_KEY
         ]
 
-        return climate is not None and climate.is_hvac_running and climate.ac_duration is not None
+        return (
+            climate is not None
+            and self.coordinator.is_hvac_running
+            and not self.coordinator.is_climate_pending_state_active
+            and climate.ac_duration is not None
+        )
 
     @property
     def native_value(self) -> datetime | None:

@@ -55,6 +55,9 @@
             },
             "hvac_timer": {
                 "name": "Klima-Timer"
+            },
+            "last_battery_status_update": {
+                "name": "Letzte Abfrage"
             }
         },
         "switch": {
@@ -73,6 +76,9 @@
         "button": {
             "request_update": {
                 "name": "Aktualisierung anfordern"
+            },
+            "start_charging": {
+                "name": "Laden starten"
             }
         }
     },
