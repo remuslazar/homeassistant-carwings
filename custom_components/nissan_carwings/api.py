@@ -5,14 +5,14 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any
 
-import pycarwings3
-import pycarwings3.responses
-from pycarwings3.responses import CarwingsLatestClimateControlStatusResponse
+from pycarwings3.responses import (
+    CarwingsLatestClimateControlStatusResponse,
+    CarwingsLatestBatteryStatusResponse,
+    CarwingsDrivingAnalysisResponse,
+)
+from pycarwings3 import Session, CarwingsError
 
-from custom_components.nissan_carwings.const import (
-    DATA_BATTERY_STATUS_KEY,
-    DATA_DRIVING_ANALYSIS_KEY,
-    DATA_TIMESTAMP_KEY,
+from .const import (
     LOGGER,
     PYCARWINGS_MAX_RESPONSE_ATTEMPTS,
     PYCARWINGS_SLEEP,
@@ -74,7 +74,7 @@ class NissanCarwingsApiClient:
 
         if base_url:
             # use the custom base_url the user has provided via
-            self._carwings3 = pycarwings3.Session(
+            self._carwings3 = Session(
                 username,
                 password,
                 region,
@@ -82,7 +82,7 @@ class NissanCarwingsApiClient:
                 base_url=base_url,
             )
         else:
-            self._carwings3 = pycarwings3.Session(username, password, region, session=session)
+            self._carwings3 = Session(username, password, region, session=session)
 
     async def async_test_credentials(self) -> dict[str, str]:
         """
@@ -99,7 +99,7 @@ class NissanCarwingsApiClient:
                 response.vin,
             )
 
-        except pycarwings3.CarwingsError as exception:
+        except CarwingsError as exception:
             msg = f"Error fetching information - {exception}"
             if str(exception) == "INVALID PARAMS":
                 LOGGER.error("Login failed: username=%s, region=%s", self._username, self._region)
@@ -164,14 +164,12 @@ class NissanCarwingsApiClient:
             finally:
                 self.is_update_in_progress = False
 
-    async def async_get_data(self) -> Any:
+    async def async_get_data(self) -> CarwingsLatestBatteryStatusResponse | None:
         """Get data from the API."""
         try:
             response = await self._carwings3.get_leaf()
             LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
-            battery_status: (
-                pycarwings3.responses.CarwingsLatestBatteryStatusResponse | None
-            ) = await response.get_latest_battery_status()
+            battery_status: CarwingsLatestBatteryStatusResponse | None = await response.get_latest_battery_status()
             if battery_status:
                 LOGGER.debug(
                     f"carwings3.get_latest_battery_status() OK: SOC={battery_status.battery_percent:.0f}%, timestamp={battery_status.timestamp}"  # noqa: E501
@@ -184,10 +182,7 @@ class NissanCarwingsApiClient:
                 msg,
             ) from exception
         else:
-            return {
-                DATA_BATTERY_STATUS_KEY: battery_status,
-                DATA_TIMESTAMP_KEY: battery_status.timestamp if battery_status else None,
-            }
+            return battery_status
 
     async def async_get_climate_data(self) -> CarwingsLatestClimateControlStatusResponse | None:
         """Get data from the API."""
@@ -218,17 +213,15 @@ class NissanCarwingsApiClient:
 
             result_key = await response.start_climate_control() if switch_on else await response.stop_climate_control()
             LOGGER.debug("carwings3.start/stop_climate_control() OK: resultKey=%s", result_key)
-        except pycarwings3.CarwingsError as exception:
+        except CarwingsError as exception:
             LOGGER.error("Error setting climate control - %s", exception)
 
-    async def async_get_driving_analysis_data(self) -> Any:
+    async def async_get_driving_analysis_data(self) -> CarwingsDrivingAnalysisResponse | None:
         """Get data from the API."""
         try:
             response = await self._carwings3.get_leaf()
             LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
-            driving_analysis: (
-                pycarwings3.responses.CarwingsDrivingAnalysisResponse | None
-            ) = await response.get_driving_analysis()
+            driving_analysis: CarwingsDrivingAnalysisResponse | None = await response.get_driving_analysis()
             if driving_analysis:
                 LOGGER.debug(
                     f"carwings3.get_drive_analysis() OK; target_date={driving_analysis.target_date}, mileage={driving_analysis.electric_mileage}"
@@ -241,7 +234,4 @@ class NissanCarwingsApiClient:
                 msg,
             ) from exception
         else:
-            return {
-                DATA_DRIVING_ANALYSIS_KEY: driving_analysis,
-                DATA_TIMESTAMP_KEY: None,  # unfortunately there is no timestamp info in the response
-            }
+            return driving_analysis
