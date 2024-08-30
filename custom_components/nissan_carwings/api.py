@@ -235,3 +235,10 @@ class NissanCarwingsApiClient:
             ) from exception
         else:
             return driving_analysis
+
+    async def async_start_charging(self) -> bool:
+        """Start charging."""
+        response = await self._carwings3.get_leaf()
+        result = await response.start_charging()
+        LOGGER.debug("carwings3.start_charging(): result=%s", result)
+        return result
