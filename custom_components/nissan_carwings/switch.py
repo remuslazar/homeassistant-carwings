@@ -38,6 +38,7 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     """nissan_carwings switch class."""
 
     _attr_translation_key = "ac_control"
+    coordinator: CarwingsClimateDataUpdateCoordinator
 
     def __init__(
         self,
@@ -51,33 +52,7 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return true if the switch is on."""
-
-        data: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
-            DATA_CLIMATE_STATUS_KEY
-        ]
-
-        pending_state = self.coordinator.config_entry.runtime_data.climate_pending_state
-        # respect the pending state if it was requested after the last update
-        if (
-            data is None
-            or data.ac_start_stop_date_and_time is None
-            or pending_state.pending_timestamp > data.ac_start_stop_date_and_time
-        ):
-            is_hvac_running = pending_state.pending_state
-        else:
-            is_hvac_running = data.is_hvac_running
-
-        # check if the maximum running time has been reached or exceeded
-        if (
-            data is not None
-            and is_hvac_running
-            and data.ac_start_stop_date_and_time is not None
-            and data.ac_duration is not None
-        ):
-            if datetime.now().astimezone(tz=UTC) > data.ac_start_stop_date_and_time + data.ac_duration:
-                is_hvac_running = False
-
-        return is_hvac_running
+        return self.coordinator.is_hvac_running
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""

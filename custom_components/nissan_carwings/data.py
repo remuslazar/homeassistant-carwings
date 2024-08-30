@@ -59,4 +59,4 @@ class NissanCarwingsClimatePendingState:
     def pending_state(self, state: bool) -> None:
         """Set the pending state and update the timestamp."""
         self._pending_state = state
-        self._pending_timestamp = datetime.now(UTC)
+        self._pending_timestamp = datetime.now(UTC).replace(second=0, microsecond=0)
