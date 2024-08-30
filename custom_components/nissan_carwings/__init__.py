@@ -27,7 +27,7 @@ from .coordinator import (
     CarwingsDataUpdateCoordinator,
     CarwingsDrivingAnalysisDataUpdateCoordinator,
 )
-from .data import NissanCarwingsData
+from .data import NissanCarwingsClimatePendingState, NissanCarwingsData
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -71,6 +71,7 @@ async def async_setup_entry(
         integration=async_get_loaded_integration(hass, entry.domain),
         coordinator=coordinator,
         climate_coordinator=climate_coordinator,
+        climate_pending_state=NissanCarwingsClimatePendingState(),
         driving_analysis_coordinator=driving_analysis_coordinator,
     )
 

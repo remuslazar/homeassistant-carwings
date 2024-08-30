@@ -56,6 +56,9 @@
             },
             "hvac_timer": {
                 "name": "AC Timer"
+            },
+            "last_battery_status_update": {
+                "name": "Last Poll Request"
             }
         },
         "switch": {
