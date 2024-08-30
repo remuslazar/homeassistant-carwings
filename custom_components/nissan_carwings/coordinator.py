@@ -150,21 +150,22 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
     @property
     def is_hvac_running(self) -> bool:
         """Return the current state of the climate control."""
-        climate_status: CarwingsLatestClimateControlStatusResponse | None = self.data.get(DATA_CLIMATE_STATUS_KEY)
-        if climate_status is None:
-            return False
 
+        climate_status: CarwingsLatestClimateControlStatusResponse | None = self.data.get(DATA_CLIMATE_STATUS_KEY)
         climate_pending_state = self.config_entry.runtime_data.climate_pending_state
 
         is_hvac_running = (
             climate_pending_state.pending_state
             if self.is_climate_pending_state_active
             else climate_status.is_hvac_running
+            if climate_status is not None
+            else False
         )
 
         # check if the maximum running time has been reached or exceeded
         if (
             is_hvac_running
+            and climate_status is not None
             and climate_status.ac_start_stop_date_and_time is not None
             and climate_status.ac_duration is not None
         ):
