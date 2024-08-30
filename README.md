@@ -73,4 +73,4 @@ If you want to contribute to this please read the [Contribution guidelines](CONT
 [releases-shield]: https://img.shields.io/github/release/remuslazar/homeassistant-carwings.svg?style=for-the-badge
 [releases]: https://github.com/remuslazar/homeassistant-carwings/releases
 [hacs-repo-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
-[hacs-install]: https://my.home-assistant.io/redirect/hacs_repository/?owner=remuslazar&repository=https%3A%2F%2Fgithub.com%2Fremuslazar%2Fhomeassistant-carwings&category=Integration
+[hacs-install]: https://my.home-assistant.io/redirect/hacs_repository/?owner=remuslazar&repository=homeassistant-carwings&category=Integration
