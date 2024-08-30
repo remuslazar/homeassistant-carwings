@@ -21,6 +21,9 @@ UPDATE_INTERVAL_WHILE_AWAITING_UPDATE = 60
 DEFAULT_POLL_INTERVAL = 7200
 DEFAULT_POLL_INTERVAL_CHARGING = 900
 
+# we will use this poll interval when the last update has failed to avoid hammering the API with too many requests
+POLL_INTERVAL_WHEN_FAILED = 900
+
 DATA_BATTERY_STATUS_KEY = "battery_status"
 DATA_CLIMATE_STATUS_KEY = "climate_status"
 DATA_DRIVING_ANALYSIS_KEY = "driving_analysis"

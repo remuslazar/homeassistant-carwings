@@ -30,6 +30,7 @@ from .const import (
     OPTIONS_POLL_INTERVAL,
     OPTIONS_POLL_INTERVAL_CHARGING,
     OPTIONS_UPDATE_INTERVAL,
+    POLL_INTERVAL_WHEN_FAILED,
     UPDATE_INTERVAL_WHILE_AWAITING_UPDATE,
 )
 
@@ -72,9 +73,8 @@ class CarwingsBaseDataUpdateCoordinator(DataUpdateCoordinator):
 class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    # timestamp of the last successful poll
-    battery_status_timestamp: datetime | None = None
-    is_charging: bool = False
+    # we will store the timestamp of the last failed attempt to update the data
+    last_failed_attempt_timestamp: datetime | None = None
 
     async def _async_update_data(self) -> Any:
         """Update data via library."""
@@ -85,22 +85,26 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
                 if self.is_charging
                 else self.config_entry.options.get(OPTIONS_POLL_INTERVAL, DEFAULT_POLL_INTERVAL)
             )
+
+            interval_when_failed = timedelta(seconds=POLL_INTERVAL_WHEN_FAILED)
             if (
-                self.battery_status_timestamp is not None
+                self.latest_update_timestamp is not None
                 and interval.seconds > 0
-                and (datetime.now(UTC) - self.battery_status_timestamp) > interval
+                and (
+                    self.last_failed_attempt_timestamp is None
+                    and datetime.now(UTC) - self.latest_update_timestamp > interval
+                    or self.last_failed_attempt_timestamp is not None
+                    and datetime.now(UTC) - self.last_failed_attempt_timestamp > interval_when_failed
+                )
             ):
-                local_timestamp = self.battery_status_timestamp.astimezone(tz=ZoneInfo(self.hass.config.time_zone))
+                local_timestamp = self.latest_update_timestamp.astimezone(tz=ZoneInfo(self.hass.config.time_zone))
                 LOGGER.info(
                     f"Polling for new battery_status data; old_timestamp={local_timestamp}, interval={interval} (is_charging={self.is_charging})"
                 )
                 await self.config_entry.runtime_data.client.async_update_data()
+                self.last_failed_attempt_timestamp = None
 
             battery_status = await self.config_entry.runtime_data.client.async_get_data()
-
-            if battery_status:
-                self.is_charging = battery_status.is_charging
-                self.battery_status_timestamp = battery_status.timestamp
 
             return {
                 DATA_BATTERY_STATUS_KEY: battery_status,
@@ -108,13 +112,27 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             }
 
         except NissanCarwingsApiUpdateTimeoutError as exception:
-            # in this case we want to retry the update right away but wait for the next scheduled update
-            self.battery_status_timestamp = None
+            self.last_failed_attempt_timestamp = datetime.now(UTC)
             raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
         except NissanCarwingsApiClientError as exception:
             raise UpdateFailed(exception) from exception
+
+    @property
+    def is_charging(self) -> bool:
+        """Return the current state of the battery charging."""
+        if self.data is None:
+            return False
+        battery_status = self.data.get(DATA_BATTERY_STATUS_KEY)
+        return battery_status.is_charging if battery_status is not None else False
+
+    @property
+    def latest_update_timestamp(self) -> datetime | None:
+        """Return the timestamp of the latest update."""
+        if self.data is None:
+            return None
+        return self.data.get(DATA_TIMESTAMP_KEY)
 
 
 class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
