@@ -3,16 +3,14 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import pycarwings3
 import pycarwings3.responses
-from pytz import UTC
+from pycarwings3.responses import CarwingsLatestClimateControlStatusResponse
 
 from custom_components.nissan_carwings.const import (
     DATA_BATTERY_STATUS_KEY,
-    DATA_CLIMATE_STATUS_KEY,
     DATA_DRIVING_ANALYSIS_KEY,
     DATA_TIMESTAMP_KEY,
     LOGGER,
@@ -56,14 +54,6 @@ def _verify_response_or_raise(response: aiohttp.ClientResponse) -> None:
 
 class NissanCarwingsApiClient:
     """Nissan Carwings API Client."""
-
-    # pending state for the climate control:
-    # None if no change is pending, True if it should be turned on
-    # False if it should be turned off
-    climate_control_pending_state = None
-
-    # timestamp when the climate control change was requested
-    climate_control_pending_timestamp = None
 
     is_update_in_progress = False
     update_semaphore = asyncio.Semaphore(1)
@@ -199,14 +189,12 @@ class NissanCarwingsApiClient:
                 DATA_TIMESTAMP_KEY: battery_status.timestamp if battery_status else None,
             }
 
-    async def async_get_climate_data(self) -> Any:
+    async def async_get_climate_data(self) -> CarwingsLatestClimateControlStatusResponse | None:
         """Get data from the API."""
         try:
             response = await self._carwings3.get_leaf()
             LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
-            climate_status: (
-                pycarwings3.responses.CarwingsLatestClimateControlStatusResponse | None
-            ) = await response.get_latest_hvac_status()
+            climate_status: CarwingsLatestClimateControlStatusResponse | None = await response.get_latest_hvac_status()
             if climate_status:
                 LOGGER.debug(
                     f"carwings3.get_latest_hvac_status() OK: running={climate_status.is_hvac_running}, remaining_time={climate_status.ac_duration}, start/stop timestamp: {climate_status.ac_start_stop_date_and_time}"  # noqa: E501
@@ -219,19 +207,10 @@ class NissanCarwingsApiClient:
                 msg,
             ) from exception
         else:
-            return {
-                DATA_CLIMATE_STATUS_KEY: climate_status,
-                DATA_TIMESTAMP_KEY: climate_status.timestamp if climate_status else None,
-            }
+            return climate_status
 
     async def async_set_climate(self, *, switch_on: bool = True) -> Any:
         """Set climate control."""
-
-        # remember the pending state
-        self.climate_control_pending_state = switch_on
-
-        # timestamp when the change was requested
-        self.climate_control_pending_timestamp = datetime.now().astimezone(tz=UTC)
 
         try:
             response = await self._carwings3.get_leaf()

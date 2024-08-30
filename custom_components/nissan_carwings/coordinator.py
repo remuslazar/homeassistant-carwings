@@ -20,6 +20,7 @@ from .api import (
 from .const import (
     DATA_BATTERY_STATUS_KEY,
     DATA_CLIMATE_STATUS_KEY,
+    DATA_TIMESTAMP_KEY,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_POLL_INTERVAL_CHARGING,
     DEFAULT_UPDATE_INTERVAL,
@@ -122,15 +123,13 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
         """Update data via library."""
         try:
             client = self.config_entry.runtime_data.client
-            data = await client.async_get_climate_data()
-            climate_data: pycarwings3.pycarwings3.CarwingsLatestClimateControlStatusResponse = data.get(
-                DATA_CLIMATE_STATUS_KEY
-            )
-            if client.climate_control_pending_timestamp is not None:
+            climate_pending_state = self.config_entry.runtime_data.climate_pending_state
+            climate_status = await client.async_get_climate_data()
+            if climate_status:
                 # check if the pending state is still in effect
                 if (
-                    climate_data.ac_start_stop_date_and_time is None
-                    or client.climate_control_pending_timestamp > climate_data.ac_start_stop_date_and_time
+                    climate_status.ac_start_stop_date_and_time is None
+                    or climate_pending_state.pending_timestamp > climate_status.ac_start_stop_date_and_time
                 ):
                     # pending state is still in effect, we will poll more frequently
                     self.update_interval = timedelta(seconds=UPDATE_INTERVAL_WHILE_AWAITING_UPDATE)
@@ -140,7 +139,10 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
                         seconds=self.config_entry.options.get(OPTIONS_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
                     )
 
-            return data
+            return {
+                DATA_CLIMATE_STATUS_KEY: climate_status,
+                DATA_TIMESTAMP_KEY: climate_status.timestamp if climate_status else None,
+            }
         except NissanCarwingsApiUpdateTimeoutError as exception:
             raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
