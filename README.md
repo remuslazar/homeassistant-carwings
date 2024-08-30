@@ -8,6 +8,7 @@
 [![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 
 [![Community Forum][forum-shield]][forum]
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
 ## Overview
 
@@ -20,6 +21,21 @@ This unofficial integration allows Home Assistant to interact with Nissan Connec
 - **Quick Home Assistant Restarts**: Designed for minimal impact on Home Assistant's restart times.
 
 ## Installation
+
+### Using HACS (recommended)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.][hacs-repo-badge]][hacs-install]
+
+Or:
+
+1. Open the [HACS](https://hacs.xyz) panel in your Home Assistant frontend.
+1. Navigate to the "Integrations" tab.
+1. Click the three dots in the top-right corner and select "Custom Repositories."
+1. Add a new custom repository:
+   - **URL:** `https://github.com/remuslazar/homeassistant-carwings`
+   - **Category:** Integration
+1. Click "Save" and then click "Install" on the `Nissan Carwings` integration.
+### Manually
 
 1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 1. If you do not have a `custom_components` directory (folder) there, you need to create it.
@@ -56,3 +72,5 @@ If you want to contribute to this please read the [Contribution guidelines](CONT
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Remus%20Lazar%20%40remuslazar-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/remuslazar/homeassistant-carwings.svg?style=for-the-badge
 [releases]: https://github.com/remuslazar/homeassistant-carwings/releases
+[hacs-repo-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
+[hacs-install]: https://my.home-assistant.io/redirect/hacs_repository/?owner=remuslazar&repository=homeassistant-carwings&category=Integration
