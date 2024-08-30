@@ -144,10 +144,7 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             climate_status = await self.config_entry.runtime_data.client.async_get_climate_data()
             if climate_status:
                 # check if the pending state is still in effect
-                if self.is_climate_pending_state_active:
-                    # pending state is still in effect, we will poll more frequently
-                    self.update_interval = timedelta(seconds=UPDATE_INTERVAL_WHILE_AWAITING_UPDATE)
-                else:
+                if not self.is_climate_pending_state_active:
                     # pending state is no longer in effect, we will return to the normal update interval
                     self.update_interval = timedelta(
                         seconds=self.config_entry.options.get(OPTIONS_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
@@ -163,6 +160,15 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
             raise ConfigEntryAuthFailed(exception) from exception
         except NissanCarwingsApiClientError as exception:
             raise UpdateFailed(exception) from exception
+
+    def set_climate_pending_state(self, pending_state: bool) -> None:
+        """Set the climate pending state."""
+        self.config_entry.runtime_data.climate_pending_state.pending_state = pending_state
+        self.update_interval = timedelta(seconds=UPDATE_INTERVAL_WHILE_AWAITING_UPDATE)
+
+        # hack to reset the current update schedule (else the modified update_interval will not be applied)
+        if self.data is not None:
+            self.async_set_updated_data(self.data)
 
     @property
     def is_hvac_running(self) -> bool:
