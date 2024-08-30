@@ -50,14 +50,12 @@ class ClimateControlSwitch(NissanCarwingsEntity, SwitchEntity):
         """Turn on the switch."""
         client = self.coordinator.config_entry.runtime_data.client
         await client.async_set_climate(switch_on=True)
-        self.coordinator.config_entry.runtime_data.climate_pending_state.pending_state = True
+        self.coordinator.set_climate_pending_state(True)
         self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **_: Any) -> None:
         """Turn off the switch."""
         client = self.coordinator.config_entry.runtime_data.client
         await client.async_set_climate(switch_on=False)
-        self.coordinator.config_entry.runtime_data.climate_pending_state.pending_state = False
+        self.coordinator.set_climate_pending_state(False)
         self.async_write_ha_state()
-        await self.coordinator.async_request_refresh()

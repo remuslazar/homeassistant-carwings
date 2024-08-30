@@ -212,7 +212,7 @@ class NissanCarwingsApiClient:
             LOGGER.debug("carwings3.get_leaf() OK: vin=%s", response.vin)
 
             result_key = await response.start_climate_control() if switch_on else await response.stop_climate_control()
-            LOGGER.debug("carwings3.start/stop_climate_control() OK: resultKey=%s", result_key)
+            LOGGER.debug(f"carwings3.{'start' if switch_on else 'stop'}_climate_control() OK: resultKey={result_key}")
         except CarwingsError as exception:
             LOGGER.error("Error setting climate control - %s", exception)
 
