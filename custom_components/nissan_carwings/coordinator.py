@@ -203,10 +203,11 @@ class CarwingsClimateDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
         climate_pending_state = self.config_entry.runtime_data.climate_pending_state
         climate_status: CarwingsLatestClimateControlStatusResponse = self.data[DATA_CLIMATE_STATUS_KEY]
 
+        # we will also consider the pending state as active if there is no status data available
         return (
-            climate_status is not None
-            and climate_status.ac_start_stop_date_and_time is not None
-            and climate_pending_state.pending_timestamp > climate_status.ac_start_stop_date_and_time
+            climate_status is None
+            or climate_status.ac_start_stop_date_and_time is None
+            or climate_pending_state.pending_timestamp > climate_status.ac_start_stop_date_and_time
         )
 
 
