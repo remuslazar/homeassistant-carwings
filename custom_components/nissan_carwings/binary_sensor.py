@@ -52,13 +52,12 @@ class LeafPluggedInSensor(NissanCarwingsEntity, BinarySensorEntity):
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
     @property
-    def available(self) -> bool:
-        """Sensor availability."""
-        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_connected is not None
-
-    @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if plugged in."""
+
+        if self.coordinator.data[DATA_BATTERY_STATUS_KEY] is None:
+            return None
+
         return bool(self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_connected)
 
 
@@ -78,11 +77,10 @@ class LeafChargingSensor(NissanCarwingsEntity, BinarySensorEntity):
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
     @property
-    def available(self) -> bool:
-        """Sensor availability."""
-        return self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging is not None
-
-    @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if charging."""
+
+        if self.coordinator.data[DATA_BATTERY_STATUS_KEY] is None:
+            return None
+
         return bool(self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging)
