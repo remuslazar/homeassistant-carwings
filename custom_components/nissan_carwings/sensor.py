@@ -74,18 +74,21 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
     @property
     def native_value(self) -> str | None:
         """Return the native value of the sensor."""
+
+        if self.coordinator.data[DATA_BATTERY_STATUS_KEY] is None:
+            return None
+
         return round(self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent)
 
     @property
     def icon(self) -> str:
         """Battery state icon handling."""
-        charging = self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging
+        charging = (
+            self.coordinator.data[DATA_BATTERY_STATUS_KEY].is_charging
+            if self.coordinator.data[DATA_BATTERY_STATUS_KEY] is not None
+            else None
+        )
         return icon_for_battery_level(battery_level=self.state, charging=charging)
-
-    @property
-    def available(self) -> bool:
-        """Sensor availability."""
-        return self.coordinator.data[DATA_BATTERY_STATUS_KEY] is not None
 
 
 class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
@@ -108,15 +111,18 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Battery range in miles or kms."""
-        data: pycarwings3.responses.CarwingsLatestBatteryStatusResponse = self.coordinator.data[DATA_BATTERY_STATUS_KEY]
+        data: pycarwings3.responses.CarwingsLatestBatteryStatusResponse | None = self.coordinator.data[
+            DATA_BATTERY_STATUS_KEY
+        ]
+
+        if data is None:
+            return None
+
         ret: float | None
         if self._ac_on:
             ret = data.cruising_range_ac_on_km
         else:
             ret = data.cruising_range_ac_off_km
-
-        if ret is None:
-            return None
 
         if self.hass.config.units is US_CUSTOMARY_SYSTEM:
             ret = DistanceConverter.convert(ret, UnitOfLength.KILOMETERS, UnitOfLength.MILES)
@@ -129,13 +135,6 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
         if self.hass.config.units is US_CUSTOMARY_SYSTEM:
             return UnitOfLength.MILES
         return UnitOfLength.KILOMETERS
-
-    @property
-    def available(self) -> bool:
-        """Sensor availability."""
-        data: pycarwings3.responses.CarwingsLatestBatteryStatusResponse = self.coordinator.data[DATA_BATTERY_STATUS_KEY]
-        attr = "cruising_range_ac_on_km" if self._ac_on else "cruising_range_ac_off_km"
-        return hasattr(data, attr)
 
 
 class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
@@ -156,13 +155,12 @@ class BatteryCapacitySensor(NissanCarwingsEntity, SensorEntity):
         self._attr_unique_id = f"{self.unique_id_prefix}_{self.entity_description.key}"
 
     @property
-    def available(self) -> bool:
-        """Sensor availability."""
-        return self.coordinator.data[DATA_BATTERY_STATUS_KEY] is not None
-
-    @property
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
+
+        if self.coordinator.data[DATA_BATTERY_STATUS_KEY] is None:
+            return None
+
         return float(self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_remaining_amount_wh)
 
 
@@ -187,17 +185,21 @@ class DrivingAnalysisSensor(NissanCarwingsEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
+
+        if self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY] is None:
+            return None
+
         da: pycarwings3.responses.CarwingsDrivingAnalysisResponse = self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY]
         return float(da.electric_mileage)
 
     @property
-    def available(self) -> bool:
-        """Sensor availability."""
-        return self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY] is not None
-
-    @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return default attributes for Nissan leaf entities."""
+
+        if self.coordinator.data[DATA_DRIVING_ANALYSIS_KEY] is None:
+            return {
+                "VIN": self.coordinator.config_entry.data["vin"],
+            }
 
         # flatten the advice property
         try:
@@ -280,6 +282,10 @@ class HVACTimerSensor(NissanCarwingsEntity, SensorEntity):
     @property
     def native_value(self) -> datetime | None:
         """Return the native value of the sensor."""
+
+        if self.coordinator.data[DATA_CLIMATE_STATUS_KEY] is None:
+            return None
+
         if DATA_CLIMATE_STATUS_KEY not in self.coordinator.data:
             return None
         climate: pycarwings3.responses.CarwingsLatestClimateControlStatusResponse = self.coordinator.data[
