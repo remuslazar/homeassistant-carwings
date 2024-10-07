@@ -101,8 +101,12 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
                 LOGGER.info(
                     f"Polling for new battery_status data; old_timestamp={local_timestamp}, interval={interval} (is_charging={self.is_charging})"
                 )
-                await self.config_entry.runtime_data.client.async_update_data()
-                self.last_failed_attempt_timestamp = None
+                try:
+                    await self.config_entry.runtime_data.client.async_update_data()
+                    self.last_failed_attempt_timestamp = None
+                except NissanCarwingsApiUpdateTimeoutError:
+                    # handle timeout errors gracefully
+                    self.last_failed_attempt_timestamp = datetime.now(UTC)
 
             battery_status = await self.config_entry.runtime_data.client.async_get_data()
 
@@ -111,9 +115,6 @@ class CarwingsDataUpdateCoordinator(CarwingsBaseDataUpdateCoordinator):
                 DATA_TIMESTAMP_KEY: battery_status.timestamp if battery_status else None,
             }
 
-        except NissanCarwingsApiUpdateTimeoutError as exception:
-            self.last_failed_attempt_timestamp = datetime.now(UTC)
-            raise UpdateFailed(exception) from exception
         except NissanCarwingsApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
         except NissanCarwingsApiClientError as exception:
