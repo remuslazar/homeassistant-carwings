@@ -1,0 +1,6 @@
+update:
+  fields:
+    vin:
+      required: true
+      selector:
+        text:
