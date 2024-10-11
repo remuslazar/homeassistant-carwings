@@ -10,7 +10,7 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/remuslazar/homeassistant-carwings/issues",
   "requirements": [
-    "pycarwings3~=0.7.6"
+    "pycarwings3~=0.7.7"
   ],
   "single_config_entry": true,
   "version": "0.3.0"
