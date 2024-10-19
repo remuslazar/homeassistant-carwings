@@ -78,6 +78,10 @@ class BatterySensor(NissanCarwingsEntity, SensorEntity):
         if self.coordinator.data[DATA_BATTERY_STATUS_KEY] is None:
             return None
 
+        # 0% SOC is not a valid value
+        if self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent == 0:
+            return None
+
         return round(self.coordinator.data[DATA_BATTERY_STATUS_KEY].battery_percent)
 
     @property
@@ -123,6 +127,9 @@ class RemainingRangeSensor(NissanCarwingsEntity, SensorEntity):
             ret = data.cruising_range_ac_on_km
         else:
             ret = data.cruising_range_ac_off_km
+
+        if ret is None:
+            return None
 
         if self.hass.config.units is US_CUSTOMARY_SYSTEM:
             ret = DistanceConverter.convert(ret, UnitOfLength.KILOMETERS, UnitOfLength.MILES)
