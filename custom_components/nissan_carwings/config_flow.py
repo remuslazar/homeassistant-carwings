@@ -102,7 +102,7 @@ class CarwingsFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             username=username,
             password=password,
             region=region,
-            session=async_create_clientsession(self.hass),
+            session=None,
             base_url=base_url,
         )
         return await client.async_test_credentials()

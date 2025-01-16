@@ -75,7 +75,7 @@ async def async_setup_entry(
             username=entry.data[CONF_USERNAME],
             password=entry.data[CONF_PASSWORD],
             region=entry.data[CONF_REGION],
-            session=async_get_clientsession(hass),
+            session=None,
             base_url=entry.data.get(CONF_PYCARWINGS3_BASE_URL),
         ),
         integration=async_get_loaded_integration(hass, entry.domain),
