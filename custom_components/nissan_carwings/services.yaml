@@ -4,3 +4,10 @@ update:
       required: true
       selector:
         text:
+
+start_climate:
+
+stop_climate:
+
+start_charging:
+
