@@ -86,14 +86,19 @@
     "services": {
         "update": {
             "name": "Request Update",
-            "description": "Update the battery status and range of the vehicle asynchronously.",
-            "fields": {
-                "vin": {
-                    "name": "VIN",
-                    "description": "VIN of the vehicle",
-                    "example": "JN1AZ4CP9BT007988"
-                }
-            }
+            "description": "Update the battery status and range of the vehicle asynchronously."
+        },
+        "start_climate": {
+            "name": "Start Climate",
+            "description": "Starts the climate control."
+        },
+        "stop_climate": {
+            "name": "Stop Climate",
+            "description": "Stops the climate control."
+        },
+        "start_charging": {
+            "name": "Start Charging",
+            "description": "Starts charging."
         }
     }
 }

@@ -85,14 +85,19 @@
     "services": {
         "update": {
             "name": "Aktualisierung anfordern",
-            "description": "Aktualisiert die Daten des Fahrzeugs asynchron.",
-            "fields": {
-                "vin": {
-                    "name": "VIN",
-                    "description": "Fahrzeug VIN (Identifikationsnummer)",
-                    "example": "JN1FAAZE0U0000000"
-                }
-            }
+            "description": "Aktualisiert die Daten des Fahrzeugs asynchron."
+        },
+        "start_climate": {
+            "name": "Klima starten",
+            "description": "Startet die Klimaanlage."
+        },
+        "stop_climate": {
+            "name": "Klima stoppen",
+            "description": "Stoppt die Klimaanlage."
+        },
+        "start_charging": {
+            "name": "Laden starten",
+            "description": "Startet den Ladevorgang."
         }
     }
 }

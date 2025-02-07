@@ -30,3 +30,6 @@ DATA_DRIVING_ANALYSIS_KEY = "driving_analysis"
 DATA_TIMESTAMP_KEY = "timestamp"
 
 SERVICE_UPDATE = "update"
+SERVICE_START_CLIMATE = "start_climate"
+SERVICE_STOP_CLIMATE = "stop_climate"
+SERVICE_START_CHARGING = "start_charging"
