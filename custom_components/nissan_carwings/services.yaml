@@ -1,6 +1,8 @@
 update:
   fields:
     vin:
+      name: "VIN"
+      description: "VIN number"
       required: true
       selector:
         text:
