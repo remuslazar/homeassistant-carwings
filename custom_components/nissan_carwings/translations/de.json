@@ -85,19 +85,47 @@
     "services": {
         "update": {
             "name": "Aktualisierung anfordern",
-            "description": "Aktualisiert die Daten des Fahrzeugs asynchron."
+            "description": "Aktualisiert die Daten des Fahrzeugs asynchron.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Fahrzeug VIN (Identifikationsnummer)",
+                    "example": "JN1FAAZE0U0000000"
+                }
+            }
         },
         "start_climate": {
             "name": "Klima starten",
-            "description": "Startet die Klimaanlage."
+            "description": "Startet die Klimaanlage.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Fahrzeug VIN (Identifikationsnummer)",
+                    "example": "JN1FAAZE0U0000000"
+                }
+            }
         },
         "stop_climate": {
             "name": "Klima stoppen",
-            "description": "Stoppt die Klimaanlage."
+            "description": "Stoppt die Klimaanlage.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Fahrzeug VIN (Identifikationsnummer)",
+                    "example": "JN1FAAZE0U0000000"
+                }
+            }
         },
         "start_charging": {
             "name": "Laden starten",
-            "description": "Startet den Ladevorgang."
+            "description": "Startet den Ladevorgang.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "Fahrzeug VIN (Identifikationsnummer)",
+                    "example": "JN1FAAZE0U0000000"
+                }
+            }
         }
     }
 }

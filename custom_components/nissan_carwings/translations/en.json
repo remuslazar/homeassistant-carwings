@@ -86,19 +86,47 @@
     "services": {
         "update": {
             "name": "Request Update",
-            "description": "Update the battery status and range of the vehicle asynchronously."
+            "description": "Update the battery status and range of the vehicle asynchronously.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "VIN of the vehicle",
+                    "example": "JN1AZ4CP9BT007988"
+                }
+            }
         },
         "start_climate": {
             "name": "Start Climate",
-            "description": "Starts the climate control."
+            "description": "Starts the climate control.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "VIN of the vehicle",
+                    "example": "JN1AZ4CP9BT007988"
+                }
+            }
         },
         "stop_climate": {
             "name": "Stop Climate",
-            "description": "Stops the climate control."
+            "description": "Stops the climate control.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "VIN of the vehicle",
+                    "example": "JN1AZ4CP9BT007988"
+                }
+            }
         },
         "start_charging": {
             "name": "Start Charging",
-            "description": "Starts charging."
+            "description": "Starts charging.",
+            "fields": {
+                "vin": {
+                    "name": "VIN",
+                    "description": "VIN of the vehicle",
+                    "example": "JN1AZ4CP9BT007988"
+                }
+            }
         }
     }
 }
