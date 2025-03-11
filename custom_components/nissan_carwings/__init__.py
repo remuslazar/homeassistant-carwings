@@ -144,6 +144,7 @@ async def register_services(hass: HomeAssistant, entry: NissanCarwingsConfigEntr
         client = entry.runtime_data.client
         coordinator = entry.runtime_data.coordinator
         current_vin = entry.data["vin"]
+        validate_vin(service_call, current_vin, "update")
         LOGGER.debug("Service call to update data for VIN=%s", current_vin)
         # request the latest data from the Nissan servers
         await client.async_update_data()
