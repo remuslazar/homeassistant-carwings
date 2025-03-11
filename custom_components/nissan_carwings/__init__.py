@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME, Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ServiceValidationError, HomeAssistantError
 from homeassistant.loader import async_get_loaded_integration
 
 from custom_components.nissan_carwings.const import (
@@ -85,7 +85,9 @@ async def async_setup_entry(
         driving_analysis_coordinator=driving_analysis_coordinator,
     )
 
-    LOGGER.info(f"Starting Nissan Carwings integration for user={entry.data[CONF_USERNAME]}")
+    LOGGER.info(
+        f"Starting Nissan Carwings integration for user={entry.data[CONF_USERNAME]}"
+    )
 
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
     await coordinator.async_config_entry_first_refresh()
@@ -128,34 +130,50 @@ async def async_reload_entry(
 async def register_services(hass: HomeAssistant, entry: NissanCarwingsConfigEntry):
     """Register services for Nissan Carwings."""
 
-    async def async_handle_update(call):
-        """Handle service to update leaf data from Nissan servers."""
+    def validate_vin(service_call, current_vin, service_name):
+        """Validate that the VIN in the service call matches the current VIN."""
+        vin = service_call.data.get("vin")
+        if vin and vin != current_vin:
+            raise ServiceValidationError(
+                f"VIN mismatch: service call to {service_name} for VIN={vin}, but current VIN={current_vin}"
+            )
+        return True
 
+    async def async_handle_update(service_call):
+        """Handle service to update leaf data from Nissan servers."""
         client = entry.runtime_data.client
         coordinator = entry.runtime_data.coordinator
         current_vin = entry.data["vin"]
         LOGGER.debug("Service call to update data for VIN=%s", current_vin)
-
         # request the latest data from the Nissan servers
         await client.async_update_data()
         # tell the coordinator to refresh the data
         await coordinator.async_request_refresh()
 
-    async def start_climate_service(call):
+    async def start_climate_service(service_call):
         """Handle starting the climate system."""
         client = entry.runtime_data.client
+        current_vin = entry.data["vin"]
+        validate_vin(service_call, current_vin, "start climate")
+        LOGGER.debug("Service call to start climate for VIN=%s", current_vin)
         await client.async_set_climate(switch_on=True)
         entry.runtime_data.climate_coordinator.set_climate_pending_state(True)
 
-    async def stop_climate_service(call):
+    async def stop_climate_service(service_call):
         """Handle stopping the climate system."""
         client = entry.runtime_data.client
+        current_vin = entry.data["vin"]
+        validate_vin(service_call, current_vin, "stop climate")
+        LOGGER.debug("Service call to stop climate for VIN=%s", current_vin)
         await client.async_set_climate(switch_on=False)
         entry.runtime_data.climate_coordinator.set_climate_pending_state(False)
 
-    async def start_charging(call):
+    async def start_charging(service_call):
         """Handle starting charging."""
         client = entry.runtime_data.client
+        current_vin = entry.data["vin"]
+        validate_vin(service_call, current_vin, "start charging")
+        LOGGER.debug("Service call to start charging for VIN=%s", current_vin)
         try:
             result = await client.async_start_charging()
             if not result:
