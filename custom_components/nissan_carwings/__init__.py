@@ -11,8 +11,10 @@ from typing import TYPE_CHECKING
 
 from homeassistant.const import CONF_PASSWORD, CONF_REGION, CONF_USERNAME, Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import config_validation as cv
 from homeassistant.exceptions import ServiceValidationError, HomeAssistantError
 from homeassistant.loader import async_get_loaded_integration
+import voluptuous as vol
 
 from custom_components.nissan_carwings.const import (
     CONF_PYCARWINGS3_BASE_URL,
@@ -186,22 +188,26 @@ async def register_services(hass: HomeAssistant, entry: NissanCarwingsConfigEntr
         DOMAIN,
         SERVICE_UPDATE,
         async_handle_update,
+        schema=vol.Schema({vol.Required("vin"): cv.string}),
     )
 
     hass.services.async_register(
         DOMAIN,
         SERVICE_START_CLIMATE,
         start_climate_service,
+        schema=vol.Schema({vol.Required("vin"): cv.string}),
     )
 
     hass.services.async_register(
         DOMAIN,
         SERVICE_STOP_CLIMATE,
         stop_climate_service,
+        schema=vol.Schema({vol.Required("vin"): cv.string}),
     )
 
     hass.services.async_register(
         DOMAIN,
         SERVICE_START_CHARGING,
         start_charging,
+        schema=vol.Schema({vol.Required("vin"): cv.string}),
     )
