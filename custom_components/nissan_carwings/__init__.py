@@ -87,9 +87,7 @@ async def async_setup_entry(
         driving_analysis_coordinator=driving_analysis_coordinator,
     )
 
-    LOGGER.info(
-        f"Starting Nissan Carwings integration for user={entry.data[CONF_USERNAME]}"
-    )
+    LOGGER.info(f"Starting Nissan Carwings integration for user={entry.data[CONF_USERNAME]}")
 
     # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
     await coordinator.async_config_entry_first_refresh()
