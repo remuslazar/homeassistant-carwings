@@ -11,6 +11,7 @@ __pycache__
 .vscode
 coverage.xml
 .ruff_cache
+.DS_Store
 
 
 # Home Assistant configuration

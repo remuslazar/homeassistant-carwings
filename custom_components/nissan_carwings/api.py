@@ -184,7 +184,9 @@ class NissanCarwingsApiClient:
         else:
             return battery_status
 
-    async def async_get_climate_data(self) -> CarwingsLatestClimateControlStatusResponse | None:
+    async def async_get_climate_data(
+        self,
+    ) -> CarwingsLatestClimateControlStatusResponse | None:
         """Get data from the API."""
         try:
             response = await self._carwings3.get_leaf()
@@ -216,7 +218,9 @@ class NissanCarwingsApiClient:
         except CarwingsError as exception:
             LOGGER.error("Error setting climate control - %s", exception)
 
-    async def async_get_driving_analysis_data(self) -> CarwingsDrivingAnalysisResponse | None:
+    async def async_get_driving_analysis_data(
+        self,
+    ) -> CarwingsDrivingAnalysisResponse | None:
         """Get data from the API."""
         try:
             response = await self._carwings3.get_leaf()

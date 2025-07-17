@@ -1,6 +1,36 @@
 update:
   fields:
     vin:
+      name: "VIN"
+      description: "VIN number"
       required: true
       selector:
         text:
+
+start_climate:
+  fields:
+    vin:
+      name: "VIN"
+      description: "VIN number"
+      required: true
+      selector:
+        text:
+
+stop_climate:
+  fields:
+    vin:
+      name: "VIN"
+      description: "VIN number"
+      required: true
+      selector:
+        text:
+
+start_charging:
+  fields:
+    vin:
+      name: "VIN"
+      description: "VIN number"
+      required: true
+      selector:
+        text:
+

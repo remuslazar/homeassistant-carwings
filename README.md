@@ -55,6 +55,13 @@ Configuration is exclusively done through the Home Assistant UI using your Nissa
 - **Polling Interval**: Frequency of status requests to the car, which uses cellular communication and consumes a small amount of battery power from the 12V battery. Recommended setting is every 1-2 hours.
 - **Polling Interval While Charging**: Similar to the Polling Interval but for when the car is charging. The default 15-minute interval is generally suitable.
 
+## Services
+
+- **Update**: Request update from the car
+- **Start Climate**: Starts the climate control
+- **Stop Climate**: Stops the climate control
+- **Start Charging**: Starts charging
+
 ## Contributions are welcome!
 
 If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
