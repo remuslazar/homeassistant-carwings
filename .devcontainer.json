@@ -41,6 +41,13 @@
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.13.2",
             "installTools": true
+        },
+        "ghcr.io/devcontainers-extra/features/apt-packages:1": {
+            "packages": [
+                "ffmpeg",
+                "libturbojpeg0",
+                "libpcap-dev"
+            ]
         }
     }
 }
