@@ -1,6 +1,6 @@
 {
     "name": "remuslazar/homeassistant-nissan-carwings",
-    "image": "mcr.microsoft.com/devcontainers/python:3.12",
+    "image": "mcr.microsoft.com/devcontainers/base:bullseye",
     "postCreateCommand": "scripts/setup",
     "forwardPorts": [
         8123
@@ -37,5 +37,10 @@
         }
     },
     "remoteUser": "vscode",
-    "features": {}
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.13.2",
+            "installTools": true
+        }
+    }
 }
